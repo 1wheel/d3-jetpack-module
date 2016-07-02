@@ -1,6 +1,6 @@
 # d3-jetpack-module
 
-YOUR DESCRIPTION HERE. Replace all instances of `foo` in this file with the name of your new plugin.
+[d3-jetpack](https://github.com/gka/d3-jetpack) modularized. 
 
 ## Installing
 
