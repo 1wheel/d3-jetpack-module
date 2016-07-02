@@ -15,17 +15,30 @@
     "url": "https://github.com/1wheel/d3-jetpack-module.git"
   },
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && rollup -f umd -n d3 -o build/d3-jetpack-module.js -- index.js",
+    "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -g d3-selection:d3,d3-transition:d3 -n d3 -o build/d3-selection-multi.js -- index.js",
     "test": "tape 'test/**/*-test.js'",
-    "prepublish": "npm run test && uglifyjs build/d3-jetpack-module.js -c -m -o build/d3-jetpack-module.min.js",
+    "prepublish": "npm run test",
     "postpublish": "zip -j build/d3-jetpack-module.zip -- LICENSE README.md build/d3-jetpack-module.js build/d3-jetpack-module.min.js"
   },
   "devDependencies": {
-    "rollup": "0.27",
+    "eslint": "2",
+    "jsdom": "9",
+    "package-preamble": "0.0",
+    "rollup": "0.33",
     "tape": "4",
     "uglify-js": "2"
   },
   "dependencies": {
-    "d3": "^4.0.0"
-  }
+    "d3-selection": "1",
+    "d3-transition": "1"
+  },
+  "author": "Adam Pearce",
+  "contributors": [{
+    "name": "Gregor Aisch",
+    "email": "mail@driven-by-data.net",
+    "url": "http://driven-by-data.net/"
+  }, {
+    "name": "Adam Pearce",
+    "url": "http://roadtolarissa.com/"
+  }]
 }
