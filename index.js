@@ -11,3 +11,6 @@ selection.prototype.tspans = tspans
 
 export {default as wordwrap} from "./src/wordwrap";
 export {default as parseAttributes} from "./src/parseAttributes";
+export {default as f} from "./src/f";
+export {default as ascendingKey} from "./src/ascendingKey";
+export {default as descendingKey} from "./src/descendingKey";
