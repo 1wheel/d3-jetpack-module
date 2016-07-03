@@ -37,6 +37,15 @@
     return s;
   };
 
+  function tspans(lines, lh) {
+    return this.selectAll('tspan')
+        .data(lines).enter()
+      .append('tspan')
+        .text(function(d) { return d; })
+        .attr('x', 0)
+        .attr('dy', function(d, i) { return i ? lh || 15 : 0; });
+  };
+
   function wordwrap(line, maxCharactersPerLine) {
     var w = line.split(' '),
       lines = [],
@@ -61,6 +70,7 @@
 
   d3Selection.selection.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
+  d3Selection.selection.prototype.tspans = tspans
 
   exports.wordwrap = wordwrap;
   exports.parseAttributes = parseAttributes;
