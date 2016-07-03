@@ -68,12 +68,51 @@
     return lines.filter(function(d){ return d != '' });
   };
 
+  function f(){
+    var functions = arguments;
+    
+    //convert all string arguments into field accessors
+    var i = 0, l = functions.length;
+    while (i < l) {
+      if (typeof(functions[i]) === 'string' || typeof(functions[i]) === 'number'){
+        functions[i] = (function(str){ return function(d){ return d[str] }; })(functions[i])
+      }
+      i++;
+    }
+
+     //return composition of functions
+    return function(d) {
+      var i=0, l = functions.length;
+      while (i++ < l) d = functions[i-1].call(this, d);
+      return d;
+    };
+  };
+
+  function ascendingKey(key) {
+    return typeof key == 'function' ? function (a, b) {
+      return key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : key(a) >= key(b) ? 0 : NaN;
+    } : function (a, b) {
+      return a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : a[key] >= b[key] ? 0 : NaN;
+    };
+  };
+
+  function descendingKey(key) {
+    return typeof key == 'function' ? function (a, b) {
+      return key(b) < key(a) ? -1 : key(b) > key(a) ? 1 : key(b) >= key(a) ? 0 : NaN;
+    } : function (a, b) {
+      return b[key] < a[key] ? -1 : b[key] > a[key] ? 1 : b[key] >= a[key] ? 0 : NaN;
+    };
+  };
+
   d3Selection.selection.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
   d3Selection.selection.prototype.tspans = tspans
 
   exports.wordwrap = wordwrap;
   exports.parseAttributes = parseAttributes;
+  exports.f = f;
+  exports.ascendingKey = ascendingKey;
+  exports.descendingKey = descendingKey;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
