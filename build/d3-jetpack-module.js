@@ -11,6 +11,32 @@
     });
   };
 
+  function parseAttributes(name) {
+    if (typeof name === "string") {
+      var attr = {},
+        parts = name.split(/([\.#])/g), p;
+        name = parts.shift();
+      while ((p = parts.shift())) {
+        if (p == '.') attr['class'] = attr['class'] ? attr['class'] + ' ' + parts.shift() : parts.shift();
+        else if (p == '#') attr.id = parts.shift();
+      }
+      return {tag: name, attr: attr};
+    }
+    return name;
+  }
+
+  function append(name) {
+    var n = parseAttributes(name), s;
+    name = d3Selection.creator(n.tag);
+    s = this.select(function() {
+      return this.appendChild(name.apply(this, arguments));
+    });
+
+    //attrs not provided by default in v4
+    for (var key in n.attr) { s.attr(key, n.attr[key]) }
+    return s;
+  };
+
   function wordwrap(line, maxCharactersPerLine) {
     var w = line.split(' '),
       lines = [],
@@ -33,21 +59,8 @@
     return lines.filter(function(d){ return d != '' });
   };
 
-  function parseAttributes(name) {
-    if (typeof name === "string") {
-      var attr = {},
-        parts = name.split(/([\.#])/g), p;
-        name = parts.shift();
-      while ((p = parts.shift())) {
-        if (p == '.') attr['class'] = attr['class'] ? attr['class'] + ' ' + parts.shift() : parts.shift();
-        else if (p == '#') attr.id = parts.shift();
-      }
-      return {tag: name, attr: attr};
-    }
-    return name;
-  }
-
   d3Selection.selection.prototype.translate = translateSelection
+  d3Selection.selection.prototype.append = append
 
   exports.wordwrap = wordwrap;
   exports.parseAttributes = parseAttributes;
