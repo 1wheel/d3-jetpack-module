@@ -7,3 +7,4 @@ selection.prototype.translate = translateSelection
 
 
 export {default as wordwrap} from "./src/wordwrap";
+export {default as parseAttributes} from "./src/parseAttributes";
