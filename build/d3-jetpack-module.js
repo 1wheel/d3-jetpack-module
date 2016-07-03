@@ -1,9 +1,9 @@
 // https://github.com/1wheel/d3-jetpack-module Version 0.0.1. Copyright 2016 Adam Pearce.
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition'], factory) :
-  (factory((global.d3 = global.d3 || {}),global.d3,global.d3));
-}(this, function (exports,d3Selection,d3Transition) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale'], factory) :
+  (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3));
+}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale) { 'use strict';
 
   function translateSelection(xy) {
     return this.attr('transform', function(d,i) {
@@ -44,6 +44,10 @@
         .text(function(d) { return d; })
         .attr('x', 0)
         .attr('dy', function(d, i) { return i ? lh || 15 : 0; });
+  };
+
+  function appendMany(data, name){
+    return this.selectAll(null).data(data).enter().append(name);
   };
 
   function wordwrap(line, maxCharactersPerLine) {
@@ -104,15 +108,110 @@
     };
   };
 
+  function conventions(c){
+    c = c || {}
+
+    c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 80}
+
+    c.width  = c.width  || c.totalWidth  - c.margin.left - c.margin.right || 900
+    c.height = c.height || c.totalHeight - c.margin.top - c.margin.bottom || 460
+
+    c.totalWidth = c.width + c.margin.left + c.margin.right
+    c.totalHeight = c.height + c.margin.top + c.margin.bottom
+
+    c.parentSel = c.parentSel || d3Selection.select('body')
+
+    c.rootsvg = c.parentSel.append('svg')
+
+    c.svg = c.rootsvg
+        .attr('width', c.totalWidth)
+        .attr('height', c.totalHeight)
+      .append('g')
+        .attr('transform', 'translate(' + c.margin.left + ',' + c.margin.top + ')')
+
+    c.x = c.x || d3Scale.scaleLinear().range([0, c.width])
+    c.y = c.y || d3Scale.scaleLinear().range([c.height, 0])
+
+    c.xAxis = c.xAxis || axisBottom().scale(c.x)
+    c.yAxis = c.yAxis || d3Axis.axisLeft().scale(c.y)
+
+    c.drawAxis = function(){
+      c.svg.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0,' + c.height + ')')
+          .call(c.xAxis);
+
+      c.svg.append('g')
+          .attr('class', 'y axis')
+          .call(c.yAxis);
+    }
+    
+    return c
+  }
+
+  function attachTooltip(sel, tooltipSel, fieldFns){
+    if (!sel.size()) return
+
+    tooltipSel = tooltipSel || d3Selection.select('.tooltip')
+
+    sel 
+        .on('mouseover.attachTooltip', ttDisplay)
+        .on('mousemove.attachTooltip', ttMove)
+        .on('mouseout.attachTooltip',  ttHide)
+        .on('click.attachTooltip', function(d){ console.log(d) })
+
+    var d = sel.datum()
+    fieldFns = fieldFns || d3.keys(d)
+        .filter(function(str){
+          return (typeof d[str] != 'object') && (d[str] != 'array')
+        })
+        .map(function(str){
+          return function(d){ return str + ': <b>' + d[str] + '</b>'} })
+
+    function ttDisplay(d){
+      tooltipSel
+          .classed('tooltip-hidden', false)
+          .html('')
+        .appendMany(fieldFns, 'div')
+          .html(function(fn){ return fn(d) })
+
+      d3.select(this).classed('tooltipped', true)
+    }
+
+    function ttMove(d){
+      var tt = tooltipSel
+      if (!tt.size()) return
+      var e = d3.event,
+        x = e.clientX,
+        y = e.clientY,
+        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+        n = tt.node(),
+        nBB = n.getBoundingClientRect()
+
+      tt.style('top', (y+doctop-nBB.height-18)+'px');
+      tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
+    }
+
+    function ttHide(d){
+      tooltipSel.classed('tooltip-hidden', true);
+
+      d3Selection.selectAll('.tooltipped').classed('tooltipped', false)
+    }
+  }
+
   d3Selection.selection.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
   d3Selection.selection.prototype.tspans = tspans
+  d3Selection.selection.prototype.appendMany = appendMany
+  d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property
 
   exports.wordwrap = wordwrap;
   exports.parseAttributes = parseAttributes;
   exports.f = f;
   exports.ascendingKey = ascendingKey;
   exports.descendingKey = descendingKey;
+  exports.conventions = conventions;
+  exports.attachTooltip = attachTooltip;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
