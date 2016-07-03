@@ -17,5 +17,5 @@ export default function(line, maxCharactersPerLine) {
   if (words.length) {
     lines.push(words.join(' '));
   }
-  return lines;
+  return lines.filter(function(d){ return d != '' });
 };
