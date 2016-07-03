@@ -11,10 +11,6 @@
     });
   };
 
-  function foo() {
-    return 42;
-  };
-
   function wordwrap(line, maxCharactersPerLine) {
     var w = line.split(' '),
       lines = [],
@@ -34,12 +30,11 @@
     if (words.length) {
       lines.push(words.join(' '));
     }
-    return lines;
+    return lines.filter(function(d){ return d != '' });
   };
 
   d3Selection.selection.prototype.translate = translateSelection
 
-  exports.foo = foo;
   exports.wordwrap = wordwrap;
 
   Object.defineProperty(exports, '__esModule', { value: true });
