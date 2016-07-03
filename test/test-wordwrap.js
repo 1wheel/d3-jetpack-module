@@ -2,7 +2,7 @@ var tape = require('tape'),
     jetpack = require('../');
 
 
-tape('wordwrap', function(test) {
+tape('wordwrap second arg sets line length', function(test) {
   test.equal(jetpack.wordwrap('two words', 4)[0], 'two');
   test.end();
 });
