@@ -50,6 +50,15 @@
     return this.selectAll(null).data(data).enter().append(name);
   };
 
+  function at(name, value) {
+    if (typeof(name) == 'object'){
+      for (var key in name) { this.attr(key, name[key]) }
+      return this
+    } else{
+      return arguments.length == 1 ? this.attr(name) : this.attr(name, value)
+    }
+  };
+
   function wordwrap(line, maxCharactersPerLine) {
     var w = line.split(' '),
       lines = [],
@@ -203,6 +212,7 @@
   d3Selection.selection.prototype.append = append
   d3Selection.selection.prototype.tspans = tspans
   d3Selection.selection.prototype.appendMany = appendMany
+  d3Selection.selection.prototype.at = at
   d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property
 
   exports.wordwrap = wordwrap;

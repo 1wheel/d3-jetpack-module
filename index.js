@@ -5,11 +5,13 @@ import translateSelection from "./src/translate-selection";
 import append from "./src/append";
 import tspans from "./src/tspans";
 import appendMany from "./src/appendMany";
+import at from "./src/at";
 
 selection.prototype.translate = translateSelection
 selection.prototype.append = append
 selection.prototype.tspans = tspans
 selection.prototype.appendMany = appendMany
+selection.prototype.at = at
 selection.prototype.prop = selection.prototype.property
 
 export {default as wordwrap} from "./src/wordwrap";
