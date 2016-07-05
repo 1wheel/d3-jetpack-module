@@ -4,7 +4,7 @@
 
 ## Installing
 
-If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the [latest release](https://github.com/d3/d3-jetpack-module/releases/latest).
+If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the [latest build](https://github.com/1wheel/d3-jetpack-module/tree/master/build).
 
 ## API Reference
 
