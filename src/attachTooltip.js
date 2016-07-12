@@ -37,9 +37,9 @@ export default function(sel, tooltipSel, fieldFns){
     var e = d3.event,
       x = e.clientX,
       y = e.clientY,
-      doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
       n = tt.node(),
-      nBB = n.getBoundingClientRect()
+      nBB = n.getBoundingClientRect(),
+      doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
 
     tt.style('top', (y+doctop-nBB.height-18)+'px');
     tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
