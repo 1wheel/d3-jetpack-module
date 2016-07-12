@@ -16194,7 +16194,7 @@ var   y0$3;
 }));
 
 
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.1. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.2. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale'], factory) :
@@ -16389,9 +16389,9 @@ var   y0$3;
       var e = d3.event,
         x = e.clientX,
         y = e.clientY,
-        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
         n = tt.node(),
-        nBB = n.getBoundingClientRect()
+        nBB = n.getBoundingClientRect(),
+        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
 
       tt.style('top', (y+doctop-nBB.height-18)+'px');
       tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
