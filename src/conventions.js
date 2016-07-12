@@ -26,8 +26,8 @@ export default function(c){
   c.x = c.x || scaleLinear().range([0, c.width])
   c.y = c.y || scaleLinear().range([c.height, 0])
 
-  c.xAxis = c.xAxis || axisBottom().scale(c.x)
-  c.yAxis = c.yAxis || axisLeft().scale(c.y)
+  c.xAxis = c.xAxis || d3.axisBottom().scale(c.x)
+  c.yAxis = c.yAxis || d3.axisLeft().scale(c.y)
 
   c.drawAxis = function(){
     c.svg.append('g')
