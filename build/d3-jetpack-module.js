@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.2. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.3. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale'], factory) :
@@ -120,7 +120,7 @@
   function conventions(c){
     c = c || {}
 
-    c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 80}
+    c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 20}
 
     c.width  = c.width  || c.totalWidth  - c.margin.left - c.margin.right || 900
     c.height = c.height || c.totalHeight - c.margin.top - c.margin.bottom || 460
