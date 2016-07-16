@@ -16194,7 +16194,7 @@ var   y0$3;
 }));
 
 
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.3. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.4. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale'], factory) :
@@ -16252,6 +16252,15 @@ var   y0$3;
       return this
     } else{
       return arguments.length == 1 ? this.attr(name) : this.attr(name, value)
+    }
+  };
+
+  function st(name, value) {
+    if (typeof(name) == 'object'){
+      for (var key in name) { this.style(key, name[key]) }
+      return this
+    } else{
+      return arguments.length == 1 ? this.style(name) : this.style(name, value)
     }
   };
 
@@ -16409,6 +16418,7 @@ var   y0$3;
   d3Selection.selection.prototype.tspans = tspans
   d3Selection.selection.prototype.appendMany = appendMany
   d3Selection.selection.prototype.at = at
+  d3Selection.selection.prototype.st = st
   d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property
 
   exports.wordwrap = wordwrap;
