@@ -1,4 +1,4 @@
-export default function(){
+function ƒ(){
   var functions = arguments;
   
   //convert all string arguments into field accessors
@@ -17,3 +17,7 @@ export default function(){
     return d;
   };
 };
+
+f.not = function(d){ return !d }
+
+export default ƒ
