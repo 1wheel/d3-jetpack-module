@@ -1,4 +1,4 @@
-function ƒ(){
+function f(){
   var functions = arguments;
   
   //convert all string arguments into field accessors
@@ -20,4 +20,12 @@ function ƒ(){
 
 f.not = function(d){ return !d }
 
-export default ƒ
+f.objToFn =function(obj, default){
+  if (arguments.length == 1) default = null
+
+  return function(str){ return obj[str] }
+}
+
+f.run = function(d){ return d() }
+
+export default f
