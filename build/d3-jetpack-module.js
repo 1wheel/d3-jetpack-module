@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.4. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.5. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale'], factory) :
@@ -52,7 +52,7 @@
 
   function at(name, value) {
     if (typeof(name) == 'object'){
-      for (var key in name) { this.attr(key, name[key]) }
+      for (var key in name) { this.attr(key.replace('_', ''), name[key]) }
       return this
     } else{
       return arguments.length == 1 ? this.attr(name) : this.attr(name, value)
@@ -61,7 +61,7 @@
 
   function st(name, value) {
     if (typeof(name) == 'object'){
-      for (var key in name) { this.style(key, name[key]) }
+      for (var key in name) { this.style(key.replace('_', ''), name[key]) }
       return this
     } else{
       return arguments.length == 1 ? this.style(name) : this.style(name, value)
@@ -91,24 +91,33 @@
   };
 
   function f(){
-    var functions = arguments;
+    var functions = arguments
     
     //convert all string arguments into field accessors
-    var i = 0, l = functions.length;
+    var i = 0, l = functions.length
     while (i < l) {
       if (typeof(functions[i]) === 'string' || typeof(functions[i]) === 'number'){
-        functions[i] = (function(str){ return function(d){ return d[str] }; })(functions[i])
+        functions[i] = (function(str){ return function(d){ return d[str] } })(functions[i])
       }
-      i++;
+      i++
     }
 
      //return composition of functions
     return function(d) {
-      var i=0, l = functions.length;
-      while (i++ < l) d = functions[i-1].call(this, d);
-      return d;
-    };
-  };
+      var i=0, l = functions.length
+      while (i++ < l) d = functions[i-1].call(this, d)
+      return d
+    }
+  }
+
+  f.not = function(d){ return !d }
+  f.run = function(d){ return d() }
+  f.objToFn = function(obj, defaultVal){
+    if (arguments.length == 1) defaultVal = undefined
+
+    return function(str){
+      return typeof(obj[str]) !== undefined ? obj[str] : defaultVal }
+  }
 
   function ascendingKey(key) {
     return typeof key == 'function' ? function (a, b) {
@@ -193,18 +202,18 @@
         .appendMany(fieldFns, 'div')
           .html(function(fn){ return fn(d) })
 
-      d3.select(this).classed('tooltipped', true)
+      d3Selection.select(this).classed('tooltipped', true)
     }
 
     function ttMove(d){
       var tt = tooltipSel
       if (!tt.size()) return
       var e = d3.event,
-        x = e.clientX,
-        y = e.clientY,
-        n = tt.node(),
-        nBB = n.getBoundingClientRect(),
-        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+          x = e.clientX,
+          y = e.clientY,
+          n = tt.node(),
+          nBB = n.getBoundingClientRect(),
+          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
 
       tt.style('top', (y+doctop-nBB.height-18)+'px');
       tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
