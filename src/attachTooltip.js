@@ -28,18 +28,18 @@ export default function(sel, tooltipSel, fieldFns){
       .appendMany(fieldFns, 'div')
         .html(function(fn){ return fn(d) })
 
-    d3.select(this).classed('tooltipped', true)
+    select(this).classed('tooltipped', true)
   }
 
   function ttMove(d){
     var tt = tooltipSel
     if (!tt.size()) return
     var e = d3.event,
-      x = e.clientX,
-      y = e.clientY,
-      n = tt.node(),
-      nBB = n.getBoundingClientRect(),
-      doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+        x = e.clientX,
+        y = e.clientY,
+        n = tt.node(),
+        nBB = n.getBoundingClientRect(),
+        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
 
     tt.style('top', (y+doctop-nBB.height-18)+'px');
     tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
