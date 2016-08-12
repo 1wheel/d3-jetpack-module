@@ -4,4 +4,8 @@
 
 ## Installing
 
-If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the [latest build](https://github.com/1wheel/d3-jetpack-module/tree/master/build).
+If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the latest [d3v4+jetpack.js](https://raw.githubusercontent.com/1wheel/d3/jetpack/build/d3v4%2Bjetpack.js).
+
+## Documentation
+
+coming soon! So far there are only minor changes from jetpack and starterkit. 
