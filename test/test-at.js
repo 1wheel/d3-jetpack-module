@@ -31,10 +31,10 @@ tape('at can set attributes with an object', function(test) {
   test.end();
 });
 
-tape('underscores are converted to hypens', function(test) {
+tape('camelcase is converted to hypens', function(test) {
   var document = jsdom.jsdom('<div></div>');
 
-  d3.select(document.querySelector('div')).at({fill_opacity: 'propVal', max_width: 100});
+  d3.select(document.querySelector('div')).at({fillOpacity: 'propVal', maxWidth: 100});
 
   test.equal(document.querySelector('div').getAttribute('fill-opacity'), 'propVal');
   test.equal(document.querySelector('div').getAttribute('max-width'), '100');
