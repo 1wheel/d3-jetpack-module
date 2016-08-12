@@ -3,6 +3,7 @@ import {transition} from "d3-transition";
 
 import translateSelection from "./src/translate-selection";
 import append from "./src/append";
+import selectAppend from "./src/selectAppend";
 import tspans from "./src/tspans";
 import appendMany from "./src/appendMany";
 import at from "./src/at";
@@ -10,6 +11,7 @@ import st from "./src/st";
 
 selection.prototype.translate = translateSelection
 selection.prototype.append = append
+selection.prototype.selectAppend = selectAppend
 selection.prototype.tspans = tspans
 selection.prototype.appendMany = appendMany
 selection.prototype.at = at
