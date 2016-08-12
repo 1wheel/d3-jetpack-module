@@ -37,6 +37,11 @@
     return s;
   };
 
+  function selectAppend(name) {
+    var s = this.select(name)
+    return s.size() ? s : this.append(name)
+  };
+
   function tspans(lines, lh) {
     return this.selectAll('tspan')
         .data(lines).enter()
@@ -228,6 +233,7 @@
 
   d3Selection.selection.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
+  d3Selection.selection.prototype.selectAppend = selectAppend
   d3Selection.selection.prototype.tspans = tspans
   d3Selection.selection.prototype.appendMany = appendMany
   d3Selection.selection.prototype.at = at
