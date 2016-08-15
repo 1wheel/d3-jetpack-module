@@ -75,3 +75,14 @@ tape('selectAppend should select or append each child element based on whether t
   test.end();
 });
 
+
+tape('selectAppend adds a class and id', function(test) {
+  var document = jsdom.jsdom('<div></div>');
+
+  d3.select(document.querySelector('div')).selectAppend('span#id.class');
+
+  var span = document.querySelector('span');
+  test.equal(span.getAttribute('id'), 'id');
+  test.equal(span.getAttribute('class'), 'class');
+  test.end();
+});
