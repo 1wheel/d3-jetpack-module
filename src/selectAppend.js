@@ -1,4 +1,12 @@
+import {selector} from "d3-selection";
+import {creator} from "d3-selection";
+
 export default function(name) {
-  var s = this.select(name)
-  return s.size() ? s : this.append(name)
+  var select = selector(name),
+      create = creator(name);
+  return this.select(function() {
+    return select.apply(this, arguments)
+        || this.appendChild(create.apply(this, arguments));
+  });
 };
+

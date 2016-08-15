@@ -38,8 +38,12 @@
   };
 
   function selectAppend(name) {
-    var s = this.select(name)
-    return s.size() ? s : this.append(name)
+    var select = d3Selection.selector(name),
+        create = d3Selection.creator(name);
+    return this.select(function() {
+      return select.apply(this, arguments)
+          || this.appendChild(create.apply(this, arguments));
+    });
   };
 
   function tspans(lines, lh) {
