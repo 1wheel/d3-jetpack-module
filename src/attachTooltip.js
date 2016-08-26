@@ -1,4 +1,3 @@
-import {axisLeft} from 'd3-axis';
 import {select} from 'd3-selection';
 import {selectAll} from 'd3-selection';
 

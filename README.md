@@ -9,3 +9,9 @@ If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the latest 
 ## Documentation
 
 coming soon! So far there are only minor changes from jetpack and starterkit. 
+
+#### selection.at / selection.st
+
+Works like d3v3 `.attr` and `.style`
+
+
