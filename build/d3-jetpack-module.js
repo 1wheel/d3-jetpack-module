@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.7. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.9. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale'], factory) :
@@ -77,39 +77,6 @@
     }
   };
 
-  function st(name, value) {
-    if (typeof(name) == 'object'){
-      for (var key in name){
-        this.style(key.replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase(), name[key]) 
-      }
-      return this
-    } else{
-      return arguments.length == 1 ? this.style(name) : this.style(name, value)
-    }
-  };
-
-  function wordwrap(line, maxCharactersPerLine) {
-    var w = line.split(' '),
-      lines = [],
-      words = [],
-      maxChars = maxCharactersPerLine || 40,
-      l = 0;
-
-    w.forEach(function(d) {
-      if (l+d.length > maxChars) {
-        lines.push(words.join(' '));
-        words.length = 0;
-        l = 0;
-      }
-      l += d.length;
-      words.push(d);
-    });
-    if (words.length) {
-      lines.push(words.join(' '));
-    }
-    return lines.filter(function(d){ return d != '' });
-  };
-
   function f(){
     var functions = arguments
     
@@ -138,6 +105,57 @@
     return function(str){
       return typeof(obj[str]) !== undefined ? obj[str] : defaultVal }
   }
+
+  function st(name, value) {
+    if (typeof(name) == 'object'){
+      for (var key in name){
+        addStyle(this, key, name[key])
+      }
+      return this
+    } else{
+      return arguments.length == 1 ? this.style(name) : addStyle(this, name, value)
+    }
+
+
+    function addStyle(sel, style, value){
+      var style = style.replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase()
+      console.log(style)
+
+      var pxStyles = 'top left bottom right padding-top padding-left padding-bottom padding-right border-top b-width border-left-width border-botto-width m border-right-width  margin-top margin-left margin-bottom margin-right font-size width height stroke-width line-height margin padding border max-width min-width'
+
+      if (~pxStyles.indexOf(style) ){
+        sel.style(style, typeof value == 'function' ? f(value, addPx) : addPx(value))
+      } else{
+        sel.style(style, value)
+      }
+
+      return sel
+    } 
+
+    function addPx(d){ return d.match ? d : d + 'px' }
+  };
+
+  function wordwrap(line, maxCharactersPerLine) {
+    var w = line.split(' '),
+      lines = [],
+      words = [],
+      maxChars = maxCharactersPerLine || 40,
+      l = 0;
+
+    w.forEach(function(d) {
+      if (l+d.length > maxChars) {
+        lines.push(words.join(' '));
+        words.length = 0;
+        l = 0;
+      }
+      l += d.length;
+      words.push(d);
+    });
+    if (words.length) {
+      lines.push(words.join(' '));
+    }
+    return lines.filter(function(d){ return d != '' });
+  };
 
   function ascendingKey(key) {
     return typeof key == 'function' ? function (a, b) {
