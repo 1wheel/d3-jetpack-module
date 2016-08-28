@@ -47,7 +47,13 @@ The `+ px`s can also be dropped:
     selection.st({marginTop: height/2, fontSize: 40, width: width - 80})
 
 
+<a name="selectAppend" href="#selectAppend">#</a> d3.<b>selectAppend</b>(<i>selector</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/selectAppend.js#L5 "Source")
 
+Selects the first element that matches the specified selector string or if no elements match the selector, it will append an element. This is often handy for elements which are required as part of the DOM hierachy, especially when making repeated calls to the same code. When appending it will also add id and classes, same as Jetpack's [append](#append)
 
-
+```js
+d3.selectAppend('ul.fruits')
+    .selectAll('li')
+    .data(data)
+```
 
