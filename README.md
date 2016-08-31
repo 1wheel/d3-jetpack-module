@@ -8,11 +8,11 @@ If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the latest 
 
 ## Documentation
 
-coming soon! So far there are only minor changes from jetpack and starterkit. 
+coming soon! So far there are only minor changes from jetpack and starterkit: 
 
-#### selection.at
+<a name="st" href="#st">#</a> selection.<b>st</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/st.js "Source")
 
-Works like d3v3's `.attr`. Passing an object sets multiple attributes, passing a string returns a single attribute and passing a string & second argument sets a single attribute.
+Works like d3v3's `.attr`. Passing an object to value sets multiple attributes, passing a string returns a single attribute and passing a string & second argument sets a single attribute.
 
 To avoid having to use quotes around attributes and styles with hyphens when using the object notation, camelCase keys are hyphenated. Instead of:
 
@@ -32,8 +32,7 @@ you can write:
 With syntax highlighting on, it is a little easier to see the difference between keys and values when everything isn't a string. Plus there's less typing! 
 
 
-
-#### selection.st
+<a name="at" href="#at">#</a> selection.<b>at</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/at.js "Source")
 
 Like `at`, but for `style`. Additionally, when a number is passed to a style that requires a unit of measure, like `margin-top` or `font-size`, `px` is automatically appended. Instead of 
 
@@ -46,8 +45,9 @@ The `+ px`s can also be dropped:
 
     selection.st({marginTop: height/2, fontSize: 40, width: width - 80})
 
+`at` and `st` do not work on transitions.
 
-<a name="selectAppend" href="#selectAppend">#</a> d3.<b>selectAppend</b>(<i>selector</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/selectAppend.js#L5 "Source")
+<a name="selectAppend" href="#selectAppend">#</a> d3.<b>selectAppend</b>(<i>selector</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/selectAppend.js "Source")
 
 Selects the first element that matches the specified selector string or if no elements match the selector, it will append an element. This is often handy for elements which are required as part of the DOM hierachy, especially when making repeated calls to the same code. When appending it will also add id and classes, same as Jetpack's [append](#append)
 
