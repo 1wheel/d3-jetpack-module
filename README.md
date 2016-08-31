@@ -12,7 +12,7 @@ coming soon! So far there are only minor changes from jetpack and starterkit:
 
 <a name="st" href="#st">#</a> selection.<b>st</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/st.js "Source")
 
-Works like d3v3's `.attr`. Passing an object to value sets multiple attributes, passing a string returns a single attribute and passing a string & second argument sets a single attribute.
+Works like d3v3's `.attr`. Passing an object to name sets multiple attributes, passing a string returns a single attribute and passing a string & second argument sets a single attribute.
 
 To avoid having to use quotes around attributes and styles with hyphens when using the object notation, camelCase keys are hyphenated. Instead of:
 
