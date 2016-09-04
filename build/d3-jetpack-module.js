@@ -197,8 +197,8 @@
     c.x = c.x || d3Scale.scaleLinear().range([0, c.width])
     c.y = c.y || d3Scale.scaleLinear().range([c.height, 0])
 
-    c.xAxis = c.xAxis || d3.axisBottom().scale(c.x)
-    c.yAxis = c.yAxis || d3.axisLeft().scale(c.y)
+    c.xAxis = c.xAxis || d3Axis.axisBottom().scale(c.x)
+    c.yAxis = c.yAxis || d3Axis.axisLeft().scale(c.y)
 
     c.drawAxis = function(){
       c.svg.append('g')
