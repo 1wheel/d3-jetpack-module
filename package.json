@@ -1,6 +1,6 @@
 {
   "name": "d3-jetpack-module",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "handy shortcuts for d3",
   "keywords": [
     "d3",
@@ -18,7 +18,7 @@
     "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -g d3-selection:d3,d3-transition:d3,d3-axis:d3,d3-scale:d3,d3-queue:d3 -n d3 -o build/d3-jetpack-module.js -- index.js",
     "test": "tape 'test/test-*.js'",
     "prepublish": "npm run test",
-    "postpublish": "curl https://d3js.org/d3.v4.js > build/d3v4+jetpack.js && echo \"\n\n\" >> build/d3v4+jetpack.js && cat build/d3-jetpack-module.js >> build/d3v4+jetpack.js"
+    "postpublish": "bin/rollup"
   },
   "devDependencies": {
     "eslint": "2",
@@ -36,7 +36,8 @@
     "d3-selection": "1",
     "d3-transition": "1",
     "d3-axis": "1",
-    "d3-scale": "1"
+    "d3-scale": "1",
+    "d3-queue": "3"
   },
   "author": {
     "name": "Adam Pearce",
