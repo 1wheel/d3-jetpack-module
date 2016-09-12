@@ -4,7 +4,7 @@
 
 ## Installing
 
-If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the latest [d3v4+jetpack.js](https://raw.githubusercontent.com/1wheel/d3/jetpack/build/d3v4%2Bjetpack.js).
+If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the latest [d3v4+jetpack.js](https://raw.githubusercontent.com/1wheel/d3-jetpack-module/master/build/d3v4%2Bjetpack.js).
 
 ## Documentation
 
@@ -46,6 +46,35 @@ The `+ px`s can also be dropped:
     selection.st({marginTop: height/2, fontSize: 40, width: width - 80})
 
 `at` and `st` do not work on transitions.
+
+
+<a 
+name="load" href="#load">#</a> d3.<b>load</b>(<i>files, callback</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/load.js "Source")
+
+Takes an array of files paths and loads them with `queue`, `d3.csv` and `d3.json`. After all the files have loaded, calls the `callback` function with the first error (or null if none) as the first arguement and an array of the loaded files as the secound. Instead of:
+
+```js
+d3.queue()
+    .defer(d3.csv, 'state-data.csv')
+    .defer(d3.csv, 'county-data.csv')
+    .defer(d3.json, 'us.json')
+    .awaitAll(function(err, res){
+        var states = res[0],
+            counties = res[1],
+            us = res[2]
+    })
+```
+
+if you file types match their extensions, you can use: 
+
+```js
+d3.load(['state-data.csv', 'county-data.csv', 'us.json'], function(err, res){
+    var states = res[0],
+        counties = res[1],
+        us = res[2]
+})
+```
+
 
 <a name="selectAppend" href="#selectAppend">#</a> d3.<b>selectAppend</b>(<i>selector</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/selectAppend.js "Source")
 
