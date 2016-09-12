@@ -25,3 +25,4 @@ export {default as ascendingKey} from "./src/ascendingKey";
 export {default as descendingKey} from "./src/descendingKey";
 export {default as conventions} from "./src/conventions";
 export {default as attachTooltip} from "./src/attachTooltip";
+// export {default as load} from "./src/load";
