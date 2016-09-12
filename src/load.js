@@ -1,4 +1,4 @@
-// import {default as queue} from 'd3-queue';
+import {queue} from 'd3-queue';
 
 export default function(files, cb){
   var q = queue()

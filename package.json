@@ -25,6 +25,8 @@
     "jsdom": "9",
     "package-preamble": "0.0",
     "rollup": "0.33",
+    "rollup-plugin-ascii": "0.0",
+    "rollup-plugin-node-resolve": "1",
     "tape": "4",
     "uglify-js": "2",
     "d3": "4",

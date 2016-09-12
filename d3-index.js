@@ -468,5 +468,5 @@ export {
   descendingKey,
   conventions,
   attachTooltip,
-  // load
+  load
 } from "./index.js";

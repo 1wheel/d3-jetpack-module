@@ -1594,6 +1594,113 @@ var   tau$1 = 2 * pi$1;
   treeProto.x = tree_x;
   treeProto.y = tree_y;
 
+  var slice$1 = [].slice;
+
+  var noabort = {};
+
+  function Queue(size) {
+    if (!(size >= 1)) throw new Error;
+    this._size = size;
+    this._call =
+    this._error = null;
+    this._tasks = [];
+    this._data = [];
+    this._waiting =
+    this._active =
+    this._ended =
+    this._start = 0; // inside a synchronous task callback?
+  }
+
+  Queue.prototype = queue.prototype = {
+    constructor: Queue,
+    defer: function(callback) {
+      if (typeof callback !== "function" || this._call) throw new Error;
+      if (this._error != null) return this;
+      var t = slice$1.call(arguments, 1);
+      t.push(callback);
+      ++this._waiting, this._tasks.push(t);
+      poke(this);
+      return this;
+    },
+    abort: function() {
+      if (this._error == null) abort(this, new Error("abort"));
+      return this;
+    },
+    await: function(callback) {
+      if (typeof callback !== "function" || this._call) throw new Error;
+      this._call = function(error, results) { callback.apply(null, [error].concat(results)); };
+      maybeNotify(this);
+      return this;
+    },
+    awaitAll: function(callback) {
+      if (typeof callback !== "function" || this._call) throw new Error;
+      this._call = callback;
+      maybeNotify(this);
+      return this;
+    }
+  };
+
+  function poke(q) {
+    if (!q._start) try { start(q); } // let the current task complete
+    catch (e) { if (q._tasks[q._ended + q._active - 1]) abort(q, e); } // task errored synchronously
+  }
+
+  function start(q) {
+    while (q._start = q._waiting && q._active < q._size) {
+      var i = q._ended + q._active,
+          t = q._tasks[i],
+          j = t.length - 1,
+          c = t[j];
+      t[j] = end(q, i);
+      --q._waiting, ++q._active;
+      t = c.apply(null, t);
+      if (!q._tasks[i]) continue; // task finished synchronously
+      q._tasks[i] = t || noabort;
+    }
+  }
+
+  function end(q, i) {
+    return function(e, r) {
+      if (!q._tasks[i]) return; // ignore multiple callbacks
+      --q._active, ++q._ended;
+      q._tasks[i] = null;
+      if (q._error != null) return; // ignore secondary errors
+      if (e != null) {
+        abort(q, e);
+      } else {
+        q._data[i] = r;
+        if (q._waiting) poke(q);
+        else maybeNotify(q);
+      }
+    };
+  }
+
+  function abort(q, e) {
+    var i = q._tasks.length, t;
+    q._error = e; // ignore active callbacks
+    q._data = undefined; // allow gc
+    q._waiting = NaN; // prevent starting
+
+    while (--i >= 0) {
+      if (t = q._tasks[i]) {
+        q._tasks[i] = null;
+        if (t.abort) try { t.abort(); }
+        catch (e) { /* ignore */ }
+      }
+    }
+
+    q._active = NaN; // allow notification
+    maybeNotify(q);
+  }
+
+  function maybeNotify(q) {
+    if (!q._active && q._call) q._call(q._error, q._data);
+  }
+
+  function queue(concurrency) {
+    return new Queue(arguments.length ? +concurrency : Infinity);
+  }
+
   function constant$1(x) {
     return function constant() {
       return x;
@@ -3199,7 +3306,7 @@ var   tau$1 = 2 * pi$1;
     return new Step(context, 1);
   }
 
-  var slice$1 = Array.prototype.slice;
+  var slice$2 = Array.prototype.slice;
 
   function none(series, order) {
     if (!((n = series.length) > 1)) return;
@@ -3252,7 +3359,7 @@ var   tau$1 = 2 * pi$1;
     }
 
     stack.keys = function(_) {
-      return arguments.length ? (keys = typeof _ === "function" ? _ : constant$1(slice$1.call(_)), stack) : keys;
+      return arguments.length ? (keys = typeof _ === "function" ? _ : constant$1(slice$2.call(_)), stack) : keys;
     };
 
     stack.value = function(_) {
@@ -3260,7 +3367,7 @@ var   tau$1 = 2 * pi$1;
     };
 
     stack.order = function(_) {
-      return arguments.length ? (order = _ == null ? none$1 : typeof _ === "function" ? _ : constant$1(slice$1.call(_)), stack) : order;
+      return arguments.length ? (order = _ == null ? none$1 : typeof _ === "function" ? _ : constant$1(slice$2.call(_)), stack) : order;
     };
 
     stack.offset = function(_) {
@@ -4803,9 +4910,7 @@ var   tau$1 = 2 * pi$1;
   var clockNow = 0;
   var clockSkew = 0;
   var clock = typeof performance === "object" && performance.now ? performance : Date;
-  var setFrame = typeof requestAnimationFrame === "function"
-          ? (clock === Date ? function(f) { requestAnimationFrame(function() { f(clock.now()); }); } : requestAnimationFrame)
-          : function(f) { setTimeout(f, 17); };
+  var setFrame = typeof requestAnimationFrame === "function" ? requestAnimationFrame : function(f) { setTimeout(f, 17); };
   function now() {
     return clockNow || (setFrame(clearNow), clockNow = clock.now() + clockSkew);
   }
@@ -4860,8 +4965,8 @@ var   tau$1 = 2 * pi$1;
     --frame;
   }
 
-  function wake(time) {
-    clockNow = (clockLast = time || clock.now()) + clockSkew;
+  function wake() {
+    clockNow = (clockLast = clock.now()) + clockSkew;
     frame = timeout = 0;
     try {
       timerFlush();
@@ -4872,7 +4977,7 @@ var   tau$1 = 2 * pi$1;
     }
   }
 
-  function poke() {
+  function poke$1() {
     var now = clock.now(), delay = now - clockLast;
     if (delay > pokeDelay) clockSkew -= delay, clockLast = now;
   }
@@ -4900,7 +5005,7 @@ var   tau$1 = 2 * pi$1;
       if (time < Infinity) timeout = setTimeout(wake, delay);
       if (interval) interval = clearInterval(interval);
     } else {
-      if (!interval) interval = setInterval(poke, pokeDelay);
+      if (!interval) interval = setInterval(poke$1, pokeDelay);
       frame = 1, setFrame(wake);
     }
   }
@@ -6122,7 +6227,7 @@ var   t1$1 = new Date;
   var array$2 = Array.prototype;
 
   var map$2 = array$2.map;
-  var slice$2 = array$2.slice;
+  var slice$3 = array$2.slice;
 
   var implicit = {name: "implicit"};
 
@@ -6131,7 +6236,7 @@ var   t1$1 = new Date;
         domain = [],
         unknown = implicit;
 
-    range = range == null ? [] : slice$2.call(range);
+    range = range == null ? [] : slice$3.call(range);
 
     function scale(d) {
       var key = d + "", i = index.get(key);
@@ -6151,7 +6256,7 @@ var   t1$1 = new Date;
     };
 
     scale.range = function(_) {
-      return arguments.length ? (range = slice$2.call(_), scale) : range.slice();
+      return arguments.length ? (range = slice$3.call(_), scale) : range.slice();
     };
 
     scale.unknown = function(_) {
@@ -6367,11 +6472,11 @@ var   t1$1 = new Date;
     };
 
     scale.range = function(_) {
-      return arguments.length ? (range = slice$2.call(_), rescale()) : range.slice();
+      return arguments.length ? (range = slice$3.call(_), rescale()) : range.slice();
     };
 
     scale.rangeRound = function(_) {
-      return range = slice$2.call(_), interpolate$$ = interpolateRound, rescale();
+      return range = slice$3.call(_), interpolate$$ = interpolateRound, rescale();
     };
 
     scale.clamp = function(_) {
@@ -6687,7 +6792,7 @@ var   t1$1 = new Date;
     };
 
     scale.range = function(_) {
-      return arguments.length ? (range = slice$2.call(_), rescale()) : range.slice();
+      return arguments.length ? (range = slice$3.call(_), rescale()) : range.slice();
     };
 
     scale.quantiles = function() {
@@ -6726,7 +6831,7 @@ var   t1$1 = new Date;
     };
 
     scale.range = function(_) {
-      return arguments.length ? (n = (range = slice$2.call(_)).length - 1, rescale()) : range.slice();
+      return arguments.length ? (n = (range = slice$3.call(_)).length - 1, rescale()) : range.slice();
     };
 
     scale.invertExtent = function(y) {
@@ -6756,11 +6861,11 @@ var   t1$1 = new Date;
     }
 
     scale.domain = function(_) {
-      return arguments.length ? (domain = slice$2.call(_), n = Math.min(domain.length, range.length - 1), scale) : domain.slice();
+      return arguments.length ? (domain = slice$3.call(_), n = Math.min(domain.length, range.length - 1), scale) : domain.slice();
     };
 
     scale.range = function(_) {
-      return arguments.length ? (range = slice$2.call(_), n = Math.min(domain.length, range.length - 1), scale) : range.slice();
+      return arguments.length ? (range = slice$3.call(_), n = Math.min(domain.length, range.length - 1), scale) : range.slice();
     };
 
     scale.invertExtent = function(y) {
@@ -7937,8 +8042,9 @@ var   durationWeek$1 = durationDay$1 * 7;
   var SCHEDULED = 1;
   var STARTING = 2;
   var STARTED = 3;
-  var ENDING = 4;
-  var ENDED = 5;
+  var RUNNING = 4;
+  var ENDING = 5;
+  var ENDED = 6;
 
   function schedule(node, name, id, index, group, timing) {
     var schedules = node.__transition;
@@ -7986,24 +8092,32 @@ var   durationWeek$1 = durationDay$1 * 7;
     schedules[id] = self;
     self.timer = timer(schedule, 0, self.time);
 
-    // If the delay is greater than this first sleep, sleep some more;
-    // otherwise, start immediately.
     function schedule(elapsed) {
       self.state = SCHEDULED;
+      self.timer.restart(start, self.delay, self.time);
+
+      // If the elapsed delay is less than our first sleep, start immediately.
       if (self.delay <= elapsed) start(elapsed - self.delay);
-      else self.timer.restart(start, self.delay, self.time);
     }
 
     function start(elapsed) {
       var i, j, n, o;
 
+      // If the state is not SCHEDULED, then we previously errored on start.
+      if (self.state !== SCHEDULED) return stop();
+
       for (i in schedules) {
         o = schedules[i];
         if (o.name !== self.name) continue;
 
+        // While this element already has a starting transition during this frame,
+        // defer starting an interrupting transition until that transition has a
+        // chance to tick (and possibly end); see d3/d3-transition#54!
+        if (o.state === STARTED) return timeout$1(start);
+
         // Interrupt the active transition, if any.
         // Dispatch the interrupt event.
-        if (o.state === STARTED) {
+        if (o.state === RUNNING) {
           o.state = ENDED;
           o.timer.stop();
           o.on.call("interrupt", node, node.__data__, o.index, o.group);
@@ -8020,12 +8134,13 @@ var   durationWeek$1 = durationDay$1 * 7;
         }
       }
 
-      // Defer the first tick to end of the current frame; see mbostock/d3#1576.
+      // Defer the first tick to end of the current frame; see d3/d3#1576.
       // Note the transition may be canceled after start and before the first tick!
       // Note this must be scheduled before the start event; see d3/d3-transition#16!
       // Assuming this is successful, subsequent callbacks go straight to tick.
       timeout$1(function() {
         if (self.state === STARTED) {
+          self.state = RUNNING;
           self.timer.restart(tick, self.delay, self.time);
           tick(elapsed);
         }
@@ -8049,7 +8164,7 @@ var   durationWeek$1 = durationDay$1 * 7;
     }
 
     function tick(elapsed) {
-      var t = elapsed < self.duration ? self.ease.call(null, elapsed / self.duration) : (self.state = ENDING, 1),
+      var t = elapsed < self.duration ? self.ease.call(null, elapsed / self.duration) : (self.timer.restart(stop), self.state = ENDING, 1),
           i = -1,
           n = tween.length;
 
@@ -8059,12 +8174,17 @@ var   durationWeek$1 = durationDay$1 * 7;
 
       // Dispatch the end event.
       if (self.state === ENDING) {
-        self.state = ENDED;
-        self.timer.stop();
         self.on.call("end", node, node.__data__, self.index, self.group);
-        for (i in schedules) if (+i !== id) return void delete schedules[id];
-        delete node.__transition;
+        stop();
       }
+    }
+
+    function stop() {
+      self.state = ENDED;
+      self.timer.stop();
+      delete schedules[id];
+      for (var i in schedules) return; // eslint-disable-line no-unused-vars
+      delete node.__transition;
     }
   }
 
@@ -8377,7 +8497,7 @@ var   durationWeek$1 = durationDay$1 * 7;
     return new Transition(merges, this._parents, this._name, this._id);
   }
 
-  function start(name) {
+  function start$1(name) {
     return (name + "").trim().split(/^|\s+/).every(function(t) {
       var i = t.indexOf(".");
       if (i >= 0) t = t.slice(0, i);
@@ -8386,7 +8506,7 @@ var   durationWeek$1 = durationDay$1 * 7;
   }
 
   function onFunction(id, name, listener) {
-    var on0, on1, sit = start(name) ? init : set$2;
+    var on0, on1, sit = start$1(name) ? init : set$2;
     return function() {
       var schedule = sit(this, id),
           on = schedule.on;
@@ -8690,7 +8810,7 @@ var   durationWeek$1 = durationDay$1 * 7;
     return null;
   }
 
-  var slice$3 = Array.prototype.slice;
+  var slice$4 = Array.prototype.slice;
 
   function identity$5(x) {
     return x;
@@ -8712,9 +8832,10 @@ var   epsilon$2 = 1e-6;
   }
 
   function center(scale) {
-    var width = scale.bandwidth() / 2;
+    var offset = scale.bandwidth() / 2;
+    if (scale.round()) offset = Math.round(offset);
     return function(d) {
-      return scale(d) + width;
+      return scale(d) + offset;
     };
   }
 
@@ -8765,7 +8886,7 @@ var   epsilon$2 = 1e-6;
           .attr("fill", "#000")
           .attr(x, k * spacing)
           .attr(y, 0.5)
-          .attr("dy", orient === top ? "0em" : orient === bottom ? ".71em" : ".32em"));
+          .attr("dy", orient === top ? "0em" : orient === bottom ? "0.71em" : "0.32em"));
 
       if (context !== selection) {
         path = path.transition(context);
@@ -8815,15 +8936,15 @@ var   epsilon$2 = 1e-6;
     };
 
     axis.ticks = function() {
-      return tickArguments = slice$3.call(arguments), axis;
+      return tickArguments = slice$4.call(arguments), axis;
     };
 
     axis.tickArguments = function(_) {
-      return arguments.length ? (tickArguments = _ == null ? [] : slice$3.call(_), axis) : tickArguments.slice();
+      return arguments.length ? (tickArguments = _ == null ? [] : slice$4.call(_), axis) : tickArguments.slice();
     };
 
     axis.tickValues = function(_) {
-      return arguments.length ? (tickValues = _ == null ? null : slice$3.call(_), axis) : tickValues && tickValues.slice();
+      return arguments.length ? (tickValues = _ == null ? null : slice$4.call(_), axis) : tickValues && tickValues.slice();
     };
 
     axis.tickFormat = function(_) {
@@ -15871,6 +15992,16 @@ var   y0$3;
     }
   }
 
+  function load(files, cb){
+    var q = queue()
+    files.forEach(function(d){
+      var type = d.split('.').reverse()[0]
+      if (type != 'csv' && type != 'json') return cb(new Error('Invalid type', d))
+      q.defer(d3[type], d) 
+    })
+    q.awaitAll(cb)
+  }
+
   selection.prototype.translate = translateSelection
   selection.prototype.append = append
   selection.prototype.selectAppend = selectAppend
@@ -15965,6 +16096,7 @@ var   y0$3;
   exports.polygonLength = length$1;
   exports.path = path;
   exports.quadtree = quadtree;
+  exports.queue = queue;
   exports.arc = arc;
   exports.area = area$1;
   exports.line = line;
@@ -16246,6 +16378,7 @@ var   y0$3;
   exports.descendingKey = descendingKey;
   exports.conventions = conventions;
   exports.attachTooltip = attachTooltip;
+  exports.load = load;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

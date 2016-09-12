@@ -196,8 +196,8 @@
     c.x = c.x || d3Scale.scaleLinear().range([0, c.width])
     c.y = c.y || d3Scale.scaleLinear().range([c.height, 0])
 
-    c.xAxis = c.xAxis || d3Axis.axisBottom().scale(c.x)
-    c.yAxis = c.yAxis || d3Axis.axisLeft().scale(c.y)
+    c.xAxis = c.xAxis || d3.axisBottom().scale(c.x)
+    c.yAxis = c.yAxis || d3.axisLeft().scale(c.y)
 
     c.drawAxis = function(){
       c.svg.append('g')
@@ -263,6 +263,18 @@
     }
   }
 
+  // import {default as queue} from 'd3-queue';
+
+  function load(files, cb){
+    var q = queue()
+    files.forEach(function(d){
+      var type = d.split('.').reverse()[0]
+      if (type != 'csv' && type != 'json') return cb(new Error('Invalid type', d))
+      q.defer(d3[type], d) 
+    })
+    q.awaitAll(cb)
+  }
+
   d3Selection.selection.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
   d3Selection.selection.prototype.selectAppend = selectAppend
@@ -279,6 +291,7 @@
   exports.descendingKey = descendingKey;
   exports.conventions = conventions;
   exports.attachTooltip = attachTooltip;
+  exports.load = load;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
