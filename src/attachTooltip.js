@@ -1,5 +1,7 @@
 import {select} from 'd3-selection';
 import {selectAll} from 'd3-selection';
+import {event as d3event} from 'd3-selection';
+import {keys as d3keys} from 'd3-collection';
 
 export default function(sel, tooltipSel, fieldFns){
   if (!sel.size()) return
@@ -13,7 +15,7 @@ export default function(sel, tooltipSel, fieldFns){
       .on('click.attachTooltip', function(d){ console.log(d) })
 
   var d = sel.datum()
-  fieldFns = fieldFns || d3.keys(d)
+  fieldFns = fieldFns || d3keys(d)
       .filter(function(str){
         return (typeof d[str] != 'object') && (d[str] != 'array')
       })
@@ -33,7 +35,7 @@ export default function(sel, tooltipSel, fieldFns){
   function ttMove(d){
     var tt = tooltipSel
     if (!tt.size()) return
-    var e = d3.event,
+    var e = d3event,
         x = e.clientX,
         y = e.clientY,
         n = tt.node(),
