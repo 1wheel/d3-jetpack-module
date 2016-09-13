@@ -83,7 +83,7 @@ Shorthand for `d3.nest().key(key).entries(array)`. Returns an array of arrays, i
 ```js
 d3.nest()
     .key(ƒ('year'))
-    .entires(yields)
+    .entries(yields)
     .forEach(function(d){
         console.log('Count in ' + d.key + ': ' + d.values.length) })
 ```
