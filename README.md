@@ -49,7 +49,7 @@ The `+ px`s can also be dropped:
 
 
 <a 
-name="load" href="#load">#</a> d3.<b>load</b>(<i>files, callback</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/load.js "Source")
+name="loadData" href="#loadData">#</a> d3.<b>loadData</b>(<i>files, callback</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/loadData.js "Source")
 
 Takes an array of files paths and loads them with `queue`, `d3.csv` and `d3.json`. After all the files have loaded, calls the `callback` function with the first error (or null if none) as the first arguement and an array of the loaded files as the secound. Instead of:
 
@@ -68,13 +68,32 @@ d3.queue()
 if you file types match their extensions, you can use: 
 
 ```js
-d3.load(['state-data.csv', 'county-data.csv', 'us.json'], function(err, res){
+d3.loadData(['state-data.csv', 'county-data.csv', 'us.json'], function(err, res){
     var states = res[0],
         counties = res[1],
         us = res[2]
 })
 ```
 
+<a 
+name="nestBy" href="#nestBy">#</a> d3.<b>nestBy</b>(<i>array, key</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/nestBy.js "Source")
+
+Shorthand for `d3.nest().key(key).entries(array)`. Returns an array of arrays, instead of a `key`/`value` pairs. The `key` property of each array is equal the value returned by the `key` function when it is called with element of the array.  
+
+```js
+d3.nest()
+    .key(ƒ('year'))
+    .entires(yields)
+    .forEach(function(d){
+        console.log('Count in ' + d.key + ': ' + d.values.length) })
+```
+
+to 
+
+```js
+d3.nestBy(yields, ƒ('year')).forEach(function(d){
+    console.log('Count in ' + d.key  + ': ' + d.length) })
+```
 
 <a name="selectAppend" href="#selectAppend">#</a> d3.<b>selectAppend</b>(<i>selector</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/selectAppend.js "Source")
 

@@ -468,5 +468,6 @@ export {
   descendingKey,
   conventions,
   attachTooltip,
-  load
+  loadData,
+  nestBy
 } from "./index.js";

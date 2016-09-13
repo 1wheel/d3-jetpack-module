@@ -1,9 +1,9 @@
 // https://github.com/1wheel/d3-jetpack-module Version 0.0.10. Copyright 2016 Adam Pearce.
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-queue')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-queue'], factory) :
-  (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3,global.d3));
-}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale,d3Queue) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-queue'), require('d3-collection')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-queue', 'd3-collection'], factory) :
+  (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3,global.d3,global.d3));
+}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale,d3Queue,d3Collection) { 'use strict';
 
   function translateSelection(xy) {
     return this.attr('transform', function(d,i) {
@@ -263,7 +263,7 @@
     }
   }
 
-  function load(files, cb){
+  function loadData(files, cb){
     var q = d3Queue.queue()
     files.forEach(function(d){
       var type = d.split('.').reverse()[0]
@@ -271,6 +271,13 @@
       q.defer(d3[type], d) 
     })
     q.awaitAll(cb)
+  }
+
+  function nestBy(array, key){
+    return d3Collection.nest().key(key).entries(array).map(function(d){
+      d.values.key = d.key
+      return d.values
+    })
   }
 
   d3Selection.selection.prototype.translate = translateSelection
@@ -289,7 +296,8 @@
   exports.descendingKey = descendingKey;
   exports.conventions = conventions;
   exports.attachTooltip = attachTooltip;
-  exports.load = load;
+  exports.loadData = loadData;
+  exports.nestBy = nestBy;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
