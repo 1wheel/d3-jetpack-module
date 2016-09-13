@@ -65,7 +65,7 @@ d3.queue()
     })
 ```
 
-if you file types match their extensions, you can use: 
+if your file types match their extensions, you can use: 
 
 ```js
 d3.loadData(['state-data.csv', 'county-data.csv', 'us.json'], function(err, res){
