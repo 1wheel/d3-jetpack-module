@@ -1,9 +1,9 @@
 // https://github.com/1wheel/d3-jetpack-module Version 0.0.10. Copyright 2016 Adam Pearce.
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-queue'), require('d3-collection')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-queue', 'd3-collection'], factory) :
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue'], factory) :
   (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3,global.d3,global.d3));
-}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale,d3Queue,d3Collection) { 'use strict';
+}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale,d3Collection,d3Queue) { 'use strict';
 
   function translateSelection(xy) {
     return this.attr('transform', function(d,i) {
@@ -225,7 +225,7 @@
         .on('click.attachTooltip', function(d){ console.log(d) })
 
     var d = sel.datum()
-    fieldFns = fieldFns || d3.keys(d)
+    fieldFns = fieldFns || d3Collection.keys(d)
         .filter(function(str){
           return (typeof d[str] != 'object') && (d[str] != 'array')
         })
@@ -245,7 +245,7 @@
     function ttMove(d){
       var tt = tooltipSel
       if (!tt.size()) return
-      var e = d3.event,
+      var e = d3Selection.event,
           x = e.clientX,
           y = e.clientY,
           n = tt.node(),
