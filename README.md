@@ -10,29 +10,29 @@ If you use NPM, `npm install d3-jetpack-module`. Otherwise, download the latest 
 
 coming soon! So far there are only minor changes from jetpack and starterkit: 
 
-<a name="st" href="#st">#</a> selection.<b>st</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/st.js "Source")
+<a name="at" href="#at">#</a> selection.<b>at</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/at.js "Source")
 
 Works like d3v3's `.attr`. Passing an object to name sets multiple attributes, passing a string returns a single attribute and passing a string & second argument sets a single attribute.
 
 To avoid having to use quotes around attributes and styles with hyphens when using the object notation, camelCase keys are hyphenated. Instead of:
 
     selection
-        .style('stroke-width', 10)
-        .style('text-anchor', 'end')
-        .style('font-weight', 600)
+        .attr('stroke-width', 10)
+        .attr('text-anchor', 'end')
+        .attr('font-weight', 600)
 
 or with [d3-selection-multi](https://github.com/d3/d3-selection-multi): 
 
-    selection.styles({'stroke-width': 10, 'text-anchor': 'end', 'font-weight': 600})
+    selection.attrs({'stroke-width': 10, 'text-anchor': 'end', 'font-weight': 600})
 
 you can write: 
 
-    selection.st({fontSize: 10, textAnchor: 'end', fontWeight: 600})
+    selection.at({fontSize: 10, textAnchor: 'end', fontWeight: 600})
 
 With syntax highlighting on, it is a little easier to see the difference between keys and values when everything isn't a string. Plus there's less typing! 
 
 
-<a name="at" href="#at">#</a> selection.<b>at</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/at.js "Source")
+<a name="st" href="#st">#</a> selection.<b>st</b>(<i>name[, value]</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/st.js "Source")
 
 Like `at`, but for `style`. Additionally, when a number is passed to a style that requires a unit of measure, like `margin-top` or `font-size`, `px` is automatically appended. Instead of 
 
@@ -45,7 +45,7 @@ The `+ px`s can also be dropped:
 
     selection.st({marginTop: height/2, fontSize: 40, width: width - 80})
 
-`at` and `st` do not work on transitions.
+`at` and `st` do not currently work on transitions - feel free to file a pull request.
 
 
 <a 
