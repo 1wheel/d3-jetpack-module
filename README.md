@@ -45,7 +45,7 @@ The `+ px`s can also be dropped:
 
     selection.st({marginTop: height/2, fontSize: 40, width: width - 80})
 
-`at` and `st` do not currently work on transitions - feel free to file a pull request.
+`at` and `st` do not currently work on transitions.
 
 
 <a 
