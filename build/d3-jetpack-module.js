@@ -1,9 +1,9 @@
 // https://github.com/1wheel/d3-jetpack-module Version 0.0.11. Copyright 2016 Adam Pearce.
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue'], factory) :
-  (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3,global.d3,global.d3));
-}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale,d3Collection,d3Queue) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue'), require('d3-request')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue', 'd3-request'], factory) :
+  (factory((global.d3 = global.d3 || {}),global.d3,global.d3,global.d3,global.d3,global.d3,global.d3,global.d3));
+}(this, function (exports,d3Selection,d3Transition,d3Axis,d3Scale,d3Collection,d3Queue,d3Request) { 'use strict';
 
   function translateSelection(xy) {
     return this.attr('transform', function(d,i) {
@@ -267,8 +267,10 @@
     var q = d3Queue.queue()
     files.forEach(function(d){
       var type = d.split('.').reverse()[0]
-      if (type != 'csv' && type != 'json') return cb(new Error('Invalid type', d))
-      q.defer(d3[type], d) 
+
+      var loadFn = {csv: d3Request.csv, tsv: d3Request.tsv, json: d3Request.json}[type]
+      if (!loadFn) return cb(new Error('Invalid type', d))
+      q.defer(loadFn, d) 
     })
     q.awaitAll(cb)
   }

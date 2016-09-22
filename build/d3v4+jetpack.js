@@ -15994,8 +15994,10 @@ var   y0$3;
     var q = queue()
     files.forEach(function(d){
       var type = d.split('.').reverse()[0]
-      if (type != 'csv' && type != 'json') return cb(new Error('Invalid type', d))
-      q.defer(d3[type], d) 
+
+      var loadFn = {csv: csv$1, tsv: tsv$1, json: json}[type]
+      if (!loadFn) return cb(new Error('Invalid type', d))
+      q.defer(loadFn, d) 
     })
     q.awaitAll(cb)
   }
