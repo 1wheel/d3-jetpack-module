@@ -27,3 +27,4 @@ export {default as conventions} from "./src/conventions";
 export {default as attachTooltip} from "./src/attachTooltip";
 export {default as loadData} from "./src/loadData";
 export {default as nestBy} from "./src/nestBy";
+export {default as round} from "./src/round";

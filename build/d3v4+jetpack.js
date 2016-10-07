@@ -1641,13 +1641,8 @@ var   tau$1 = 2 * pi$1;
   };
 
   function poke(q) {
-    if (!q._start) {
-      try { start(q); } // let the current task complete
-      catch (e) {
-        if (q._tasks[q._ended + q._active - 1]) abort(q, e); // task errored synchronously
-        else if (!q._data) throw e; // await callback errored synchronously
-      }
-    }
+    if (!q._start) try { start(q); } // let the current task complete
+    catch (e) { if (q._tasks[q._ended + q._active - 1]) abort(q, e); } // task errored synchronously
   }
 
   function start(q) {
@@ -1689,10 +1684,8 @@ var   tau$1 = 2 * pi$1;
     while (--i >= 0) {
       if (t = q._tasks[i]) {
         q._tasks[i] = null;
-        if (t.abort) {
-          try { t.abort(); }
-          catch (e) { /* ignore */ }
-        }
+        if (t.abort) try { t.abort(); }
+        catch (e) { /* ignore */ }
       }
     }
 
@@ -1701,11 +1694,7 @@ var   tau$1 = 2 * pi$1;
   }
 
   function maybeNotify(q) {
-    if (!q._active && q._call) {
-      var d = q._data;
-      q._data = undefined; // allow gc
-      q._call(q._error, d);
-    }
+    if (!q._active && q._call) q._call(q._error, q._data);
   }
 
   function queue(concurrency) {
@@ -4921,9 +4910,7 @@ var   tau$1 = 2 * pi$1;
   var clockNow = 0;
   var clockSkew = 0;
   var clock = typeof performance === "object" && performance.now ? performance : Date;
-  var setFrame = typeof requestAnimationFrame === "function"
-          ? (clock === Date ? function(f) { requestAnimationFrame(function() { f(clock.now()); }); } : requestAnimationFrame)
-          : function(f) { setTimeout(f, 17); };
+  var setFrame = typeof requestAnimationFrame === "function" ? requestAnimationFrame : function(f) { setTimeout(f, 17); };
   function now() {
     return clockNow || (setFrame(clearNow), clockNow = clock.now() + clockSkew);
   }
@@ -4978,8 +4965,8 @@ var   tau$1 = 2 * pi$1;
     --frame;
   }
 
-  function wake(time) {
-    clockNow = (clockLast = time || clock.now()) + clockSkew;
+  function wake() {
+    clockNow = (clockLast = clock.now()) + clockSkew;
     frame = timeout = 0;
     try {
       timerFlush();
@@ -8055,8 +8042,9 @@ var   durationWeek$1 = durationDay$1 * 7;
   var SCHEDULED = 1;
   var STARTING = 2;
   var STARTED = 3;
-  var ENDING = 4;
-  var ENDED = 5;
+  var RUNNING = 4;
+  var ENDING = 5;
+  var ENDED = 6;
 
   function schedule(node, name, id, index, group, timing) {
     var schedules = node.__transition;
@@ -8104,24 +8092,32 @@ var   durationWeek$1 = durationDay$1 * 7;
     schedules[id] = self;
     self.timer = timer(schedule, 0, self.time);
 
-    // If the delay is greater than this first sleep, sleep some more;
-    // otherwise, start immediately.
     function schedule(elapsed) {
       self.state = SCHEDULED;
+      self.timer.restart(start, self.delay, self.time);
+
+      // If the elapsed delay is less than our first sleep, start immediately.
       if (self.delay <= elapsed) start(elapsed - self.delay);
-      else self.timer.restart(start, self.delay, self.time);
     }
 
     function start(elapsed) {
       var i, j, n, o;
 
+      // If the state is not SCHEDULED, then we previously errored on start.
+      if (self.state !== SCHEDULED) return stop();
+
       for (i in schedules) {
         o = schedules[i];
         if (o.name !== self.name) continue;
 
+        // While this element already has a starting transition during this frame,
+        // defer starting an interrupting transition until that transition has a
+        // chance to tick (and possibly end); see d3/d3-transition#54!
+        if (o.state === STARTED) return timeout$1(start);
+
         // Interrupt the active transition, if any.
         // Dispatch the interrupt event.
-        if (o.state === STARTED) {
+        if (o.state === RUNNING) {
           o.state = ENDED;
           o.timer.stop();
           o.on.call("interrupt", node, node.__data__, o.index, o.group);
@@ -8138,12 +8134,13 @@ var   durationWeek$1 = durationDay$1 * 7;
         }
       }
 
-      // Defer the first tick to end of the current frame; see mbostock/d3#1576.
+      // Defer the first tick to end of the current frame; see d3/d3#1576.
       // Note the transition may be canceled after start and before the first tick!
       // Note this must be scheduled before the start event; see d3/d3-transition#16!
       // Assuming this is successful, subsequent callbacks go straight to tick.
       timeout$1(function() {
         if (self.state === STARTED) {
+          self.state = RUNNING;
           self.timer.restart(tick, self.delay, self.time);
           tick(elapsed);
         }
@@ -8167,7 +8164,7 @@ var   durationWeek$1 = durationDay$1 * 7;
     }
 
     function tick(elapsed) {
-      var t = elapsed < self.duration ? self.ease.call(null, elapsed / self.duration) : (self.state = ENDING, 1),
+      var t = elapsed < self.duration ? self.ease.call(null, elapsed / self.duration) : (self.timer.restart(stop), self.state = ENDING, 1),
           i = -1,
           n = tween.length;
 
@@ -8177,12 +8174,17 @@ var   durationWeek$1 = durationDay$1 * 7;
 
       // Dispatch the end event.
       if (self.state === ENDING) {
-        self.state = ENDED;
-        self.timer.stop();
         self.on.call("end", node, node.__data__, self.index, self.group);
-        for (i in schedules) if (+i !== id) return void delete schedules[id];
-        delete node.__transition;
+        stop();
       }
+    }
+
+    function stop() {
+      self.state = ENDED;
+      self.timer.stop();
+      delete schedules[id];
+      for (var i in schedules) return; // eslint-disable-line no-unused-vars
+      delete node.__transition;
     }
   }
 
@@ -16009,6 +16011,10 @@ var   y0$3;
     })
   }
 
+  function round(n, p) {
+    return p ? Math.round(n * (p = Math.pow(10, p))) / p : Math.round(n);
+  };
+
   selection.prototype.translate = translateSelection
   selection.prototype.append = append
   selection.prototype.selectAppend = selectAppend
@@ -16387,6 +16393,7 @@ var   y0$3;
   exports.attachTooltip = attachTooltip;
   exports.loadData = loadData;
   exports.nestBy = nestBy;
+  exports.round = round;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.11. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.12. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue'), require('d3-request')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue', 'd3-request'], factory) :
@@ -282,6 +282,10 @@
     })
   }
 
+  function round(n, p) {
+    return p ? Math.round(n * (p = Math.pow(10, p))) / p : Math.round(n);
+  };
+
   d3Selection.selection.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
   d3Selection.selection.prototype.selectAppend = selectAppend
@@ -300,6 +304,7 @@
   exports.attachTooltip = attachTooltip;
   exports.loadData = loadData;
   exports.nestBy = nestBy;
+  exports.round = round;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

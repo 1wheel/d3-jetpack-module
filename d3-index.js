@@ -469,5 +469,6 @@ export {
   conventions,
   attachTooltip,
   loadData,
-  nestBy
+  nestBy,
+  round
 } from "./index.js";
