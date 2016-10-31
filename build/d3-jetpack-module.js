@@ -291,6 +291,7 @@
   };
 
   d3Selection.selection.prototype.translate = translateSelection
+  d3Transition.transition.prototype.translate = translateSelection
   d3Selection.selection.prototype.append = append
   d3Selection.selection.prototype.selectAppend = selectAppend
   d3Selection.selection.prototype.tspans = tspans

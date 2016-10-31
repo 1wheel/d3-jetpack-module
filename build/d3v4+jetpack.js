@@ -16018,6 +16018,7 @@ var   y0$3;
   };
 
   selection.prototype.translate = translateSelection
+  transition.prototype.translate = translateSelection
   selection.prototype.append = append
   selection.prototype.selectAppend = selectAppend
   selection.prototype.tspans = tspans

@@ -10,6 +10,7 @@ import at from "./src/at";
 import st from "./src/st";
 
 selection.prototype.translate = translateSelection
+transition.prototype.translate = translateSelection
 selection.prototype.append = append
 selection.prototype.selectAppend = selectAppend
 selection.prototype.tspans = tspans
