@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.12. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.14. Copyright 2016 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue'), require('d3-request')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue', 'd3-request'], factory) :
@@ -176,6 +176,9 @@
     c = c || {}
 
     c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 20}
+    ;['top', 'right', 'bottom', 'left'].forEach(function(d){
+      if (!c.margin[d] && c.margin[d] != 0) c.margin[d] = 20 
+    })
 
     c.width  = c.width  || c.totalWidth  - c.margin.left - c.margin.right || 900
     c.height = c.height || c.totalHeight - c.margin.top - c.margin.bottom || 460
@@ -250,9 +253,10 @@
           y = e.clientY,
           n = tt.node(),
           nBB = n.getBoundingClientRect(),
-          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop,
+          topPos = y+doctop-nBB.height-18;
 
-      tt.style('top', (y+doctop-nBB.height-18)+'px');
+      tt.style('top', (topPos < 0 ? 18 + y : topPos)+'px');
       tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
     }
 
