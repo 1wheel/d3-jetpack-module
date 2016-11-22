@@ -1,6 +1,6 @@
 {
   "name": "d3-jetpack-module",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "handy shortcuts for d3",
   "keywords": [
     "d3",
@@ -21,6 +21,8 @@
     "postpublish": "bin/rollup"
   },
   "devDependencies": {
+    "d3": "4",
+    "d3-selection-multi": "1",
     "eslint": "2",
     "jsdom": "9",
     "package-preamble": "0.0",
@@ -28,30 +30,32 @@
     "rollup-plugin-ascii": "0.0",
     "rollup-plugin-node-resolve": "1",
     "tape": "4",
-    "uglify-js": "2",
-    "d3": "4",
-    "d3-selection-multi": "1"
+    "uglify-js": "2"
   },
   "dependencies": {
-    "d3-selection": "1",
-    "d3-transition": "1",
+    "d3": "4",
     "d3-axis": "1",
-    "d3-scale": "1",
+    "d3-collection": "1",
     "d3-queue": "3",
-    "d3": "4"
+    "d3-scale": "1",
+    "d3-selection": "1",
+    "d3-transition": "1"
   },
   "author": {
     "name": "Adam Pearce",
     "email": "1wheel@gmail.com",
     "url": "http://roadtolarissa.com/"
   },
-  "contributors": [{
-    "name": "Gregor Aisch",
-    "email": "mail@driven-by-data.net",
-    "url": "http://driven-by-data.net/"
-  }, {
-    "name": "Adam Pearce",
-    "email": "1wheel@gmail.com",
-    "url": "http://roadtolarissa.com/"
-  }]
+  "contributors": [
+    {
+      "name": "Gregor Aisch",
+      "email": "mail@driven-by-data.net",
+      "url": "http://driven-by-data.net/"
+    },
+    {
+      "name": "Adam Pearce",
+      "email": "1wheel@gmail.com",
+      "url": "http://roadtolarissa.com/"
+    }
+  ]
 }
