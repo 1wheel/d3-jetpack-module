@@ -298,6 +298,8 @@
   d3Selection.selection.prototype.appendMany = appendMany
   d3Selection.selection.prototype.at = at
   d3Selection.selection.prototype.st = st
+  d3Transition.transition.prototype.at = at
+  d3Transition.transition.prototype.st = st
   d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property
 
   exports.wordwrap = wordwrap;

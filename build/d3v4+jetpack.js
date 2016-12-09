@@ -16025,6 +16025,8 @@ var   y0$3;
   selection.prototype.appendMany = appendMany
   selection.prototype.at = at
   selection.prototype.st = st
+  transition.prototype.at = at
+  transition.prototype.st = st
   selection.prototype.prop = selection.prototype.property
 
   exports.bisect = bisectRight;

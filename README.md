@@ -45,9 +45,6 @@ The `+ px`s can also be dropped:
 
     selection.st({marginTop: height/2, fontSize: 40, width: width - 80})
 
-`at` and `st` do not currently work on transitions.
-
-
 <a 
 name="loadData" href="#loadData">#</a> d3.<b>loadData</b>(<i>files, callback</i>) [<>](https://github.com/1wheel/d3-jetpack-module/blob/master/src/loadData.js "Source")
 
