@@ -1,6 +1,6 @@
 import {creator} from "d3-selection";
 
-export default function(name) {
+export default function() {
   var parents = [];
   return this.filter(function() {
     if (parents.indexOf(this.parentNode) > -1) return false;
