@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.15. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.16. Copyright 2017 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue'), require('d3-request')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue', 'd3-request'], factory) :
@@ -36,6 +36,12 @@
     for (var key in n.attr) { s.attr(key, n.attr[key]) }
     return s;
   };
+
+  function parent(name) {
+    return this.select(function() {
+      return this.parentNode;
+    });
+  }
 
   function selectAppend(name) {
     var select = d3Selection.selector(name),
@@ -290,17 +296,18 @@
     return p ? Math.round(n * (p = Math.pow(10, p))) / p : Math.round(n);
   };
 
-  d3Selection.selection.prototype.translate = translateSelection
-  d3Transition.transition.prototype.translate = translateSelection
-  d3Selection.selection.prototype.append = append
-  d3Selection.selection.prototype.selectAppend = selectAppend
-  d3Selection.selection.prototype.tspans = tspans
-  d3Selection.selection.prototype.appendMany = appendMany
-  d3Selection.selection.prototype.at = at
-  d3Selection.selection.prototype.st = st
-  d3Transition.transition.prototype.at = at
-  d3Transition.transition.prototype.st = st
-  d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property
+  d3Selection.selection.prototype.translate = translateSelection;
+  d3Transition.transition.prototype.translate = translateSelection;
+  d3Selection.selection.prototype.append = append;
+  d3Selection.selection.prototype.parent = parent;
+  d3Selection.selection.prototype.selectAppend = selectAppend;
+  d3Selection.selection.prototype.tspans = tspans;
+  d3Selection.selection.prototype.appendMany = appendMany;
+  d3Selection.selection.prototype.at = at;
+  d3Selection.selection.prototype.st = st;
+  d3Transition.transition.prototype.at = at;
+  d3Transition.transition.prototype.st = st;
+  d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property;
 
   exports.wordwrap = wordwrap;
   exports.parseAttributes = parseAttributes;
