@@ -18869,7 +18869,12 @@ var   y0$3;
   };
 
   function parent(name) {
-    return this.select(function() {
+    var parents = [];
+    return this.filter(function() {
+    	if (parents.indexOf(this.parentNode) > -1) return false;
+    	parents.push(this.parentNode);
+    	return true;
+    }).select(function() {
       return this.parentNode;
     });
   }
