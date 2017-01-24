@@ -4032,7 +4032,7 @@ var   tau$1 = 2 * pi$1;
       var r = color((start = colorRgb(start)).r, (end = colorRgb(end)).r),
           g = color(start.g, end.g),
           b = color(start.b, end.b),
-          opacity = color(start.opacity, end.opacity);
+          opacity = nogamma(start.opacity, end.opacity);
       return function(t) {
         start.r = r(t);
         start.g = g(t);
@@ -5002,7 +5002,7 @@ var   tau$1 = 2 * pi$1;
       if (time < Infinity) timeout = setTimeout(wake, delay);
       if (interval) interval = clearInterval(interval);
     } else {
-      if (!interval) interval = setInterval(poke$1, pokeDelay);
+      if (!interval) clockLast = clockNow, interval = setInterval(poke$1, pokeDelay);
       frame = 1, setFrame(wake);
     }
   }
@@ -11904,10 +11904,11 @@ var   keyPrefix$1 = "$";
           edges = this.edges;
 
       this.cells.forEach(function(cell, i) {
+        if (!(m = (halfedges = cell.halfedges).length)) return;
         var site = cell.site,
-            halfedges = cell.halfedges,
+            halfedges,
             j = -1,
-            m = halfedges.length,
+            m,
             s0,
             e1 = edges[halfedges[m - 1]],
             s1 = e1.left === site ? e1.right : e1.left;
@@ -11937,21 +11938,19 @@ var   keyPrefix$1 = "$";
     },
 
     find: function(x, y, radius) {
-      var that = this,
-          i0, i1 = that._found || 0,
-          cell = that.cells[i1] || that.cells[i1 = 0],
-          dx = x - cell.site[0],
-          dy = y - cell.site[1],
-          d2 = dx * dx + dy * dy;
+      var that = this, i0, i1 = that._found || 0, n = that.cells.length, cell;
 
+      // Use the previously-found cell, or start with an arbitrary one.
+      while (!(cell = that.cells[i1])) if (++i1 >= n) return null;
+      var dx = x - cell.site[0], dy = y - cell.site[1], d2 = dx * dx + dy * dy;
+
+      // Traverse the half-edges to find a closer cell, if any.
       do {
         cell = that.cells[i0 = i1], i1 = null;
         cell.halfedges.forEach(function(e) {
           var edge = that.edges[e], v = edge.left;
           if ((v === cell.site || !v) && !(v = edge.right)) return;
-          var vx = x - v[0],
-              vy = y - v[1],
-              v2 = vx * vx + vy * vy;
+          var vx = x - v[0], vy = y - v[1], v2 = vx * vx + vy * vy;
           if (v2 < d2) d2 = v2, i1 = v.index;
         });
       } while (i1 !== null);
@@ -12346,13 +12345,14 @@ var   keyPrefix$1 = "$";
       if (!filter.apply(this, arguments)) return;
       var g = gesture(this, arguments),
           touches = exports.event.changedTouches,
+          started,
           n = touches.length, i, t, p;
 
       nopropagation$1();
       for (i = 0; i < n; ++i) {
         t = touches[i], p = touch(this, touches, t.identifier);
         p = [p, this.__zoom.invert(p), t.identifier];
-        if (!g.touch0) g.touch0 = p;
+        if (!g.touch0) g.touch0 = p, started = true;
         else if (!g.touch1) g.touch1 = p;
       }
 
@@ -12367,7 +12367,7 @@ var   keyPrefix$1 = "$";
         }
       }
 
-      if (exports.event.touches.length === n) {
+      if (started) {
         touchstarting = setTimeout(function() { touchstarting = null; }, touchDelay);
         interrupt(this);
         g.start();
@@ -15854,11 +15854,17 @@ var   y0$3;
 
   function tspans(lines, lh) {
     return this.selectAll('tspan')
-        .data(lines).enter()
+        .data(function(d) {
+          return (typeof(lines) == 'function' ? lines(d) : lines)
+            .map(function(l) {
+              return { line: l, parent: d }
+            });
+        })
+        .enter()
       .append('tspan')
-        .text(function(d) { return d; })
+        .text(function(d) { return d.line; })
         .attr('x', 0)
-        .attr('dy', function(d, i) { return i ? lh || 15 : 0; });
+        .attr('dy', function(d, i) { return i ? (typeof(lh) == 'function' ? lh(d.parent, d.line, i) : lh) || 15 : 0; });
   };
 
   function appendMany(data, name){
