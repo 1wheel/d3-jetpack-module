@@ -470,5 +470,6 @@ export {
   attachTooltip,
   loadData,
   nestBy,
-  round
+  round,
+  polygonClip
 } from "./index.js";
