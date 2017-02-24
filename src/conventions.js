@@ -7,6 +7,9 @@ export default function(c){
   c = c || {}
 
   c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 20}
+  ;['top', 'right', 'bottom', 'left'].forEach(function(d){
+    if (!c.margin[d] && c.margin[d] != 0) c.margin[d] = 20 
+  })
 
   c.width  = c.width  || c.totalWidth  - c.margin.left - c.margin.right || 900
   c.height = c.height || c.totalHeight - c.margin.top - c.margin.bottom || 460

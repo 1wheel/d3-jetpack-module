@@ -1,4 +1,4 @@
-// https://github.com/1wheel/d3-jetpack-module Version 0.0.12. Copyright 2016 Adam Pearce.
+// https://github.com/1wheel/d3-jetpack-module Version 0.0.16. Copyright 2017 Adam Pearce.
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('d3-transition'), require('d3-axis'), require('d3-scale'), require('d3-collection'), require('d3-queue'), require('d3-request')) :
   typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'd3-transition', 'd3-axis', 'd3-scale', 'd3-collection', 'd3-queue', 'd3-request'], factory) :
@@ -37,6 +37,17 @@
     return s;
   };
 
+  function parent() {
+    var parents = [];
+    return this.filter(function() {
+      if (parents.indexOf(this.parentNode) > -1) return false;
+      parents.push(this.parentNode);
+      return true;
+    }).select(function() {
+      return this.parentNode;
+    });
+  }
+
   function selectAppend(name) {
     var select = d3Selection.selector(name),
        n = parseAttributes(name), s;
@@ -55,11 +66,17 @@
 
   function tspans(lines, lh) {
     return this.selectAll('tspan')
-        .data(lines).enter()
+        .data(function(d) {
+          return (typeof(lines) == 'function' ? lines(d) : lines)
+            .map(function(l) {
+              return { line: l, parent: d }
+            });
+        })
+        .enter()
       .append('tspan')
-        .text(function(d) { return d; })
+        .text(function(d) { return d.line; })
         .attr('x', 0)
-        .attr('dy', function(d, i) { return i ? lh || 15 : 0; });
+        .attr('dy', function(d, i) { return i ? (typeof(lh) == 'function' ? lh(d.parent, d.line, i) : lh) || 15 : 0; });
   };
 
   function appendMany(data, name){
@@ -176,6 +193,9 @@
     c = c || {}
 
     c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 20}
+    ;['top', 'right', 'bottom', 'left'].forEach(function(d){
+      if (!c.margin[d] && c.margin[d] != 0) c.margin[d] = 20 
+    })
 
     c.width  = c.width  || c.totalWidth  - c.margin.left - c.margin.right || 900
     c.height = c.height || c.totalHeight - c.margin.top - c.margin.bottom || 460
@@ -250,9 +270,10 @@
           y = e.clientY,
           n = tt.node(),
           nBB = n.getBoundingClientRect(),
-          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop,
+          topPos = y+doctop-nBB.height-18;
 
-      tt.style('top', (y+doctop-nBB.height-18)+'px');
+      tt.style('top', (topPos < 0 ? 18 + y : topPos)+'px');
       tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
     }
 
@@ -286,14 +307,77 @@
     return p ? Math.round(n * (p = Math.pow(10, p))) / p : Math.round(n);
   };
 
-  d3Selection.selection.prototype.translate = translateSelection
-  d3Selection.selection.prototype.append = append
-  d3Selection.selection.prototype.selectAppend = selectAppend
-  d3Selection.selection.prototype.tspans = tspans
-  d3Selection.selection.prototype.appendMany = appendMany
-  d3Selection.selection.prototype.at = at
-  d3Selection.selection.prototype.st = st
-  d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property
+  // Clips the specified subject polygon to the specified clip polygon;
+  // requires the clip polygon to be counterclockwise and convex.
+  // https://en.wikipedia.org/wiki/Sutherland–Hodgman_algorithm
+  function polygonClip(clip, subject) {
+    var input,
+        closed = polygonClosed(subject),
+        i = -1,
+        n = clip.length - polygonClosed(clip),
+        j,
+        m,
+        a = clip[n - 1],
+      b,
+      c,
+      d;
+
+    while (++i < n) {
+      input = subject.slice();
+      subject.length = 0;
+      b = clip[i];
+      c = input[(m = input.length - closed) - 1];
+      j = -1;
+      while (++j < m) {
+        d = input[j];
+        if (polygonInside(d, a, b)) {
+          if (!polygonInside(c, a, b)) {
+            subject.push(polygonIntersect(c, d, a, b));
+          }
+          subject.push(d);
+        } else if (polygonInside(c, a, b)) {
+          subject.push(polygonIntersect(c, d, a, b));
+        }
+        c = d;
+      }
+      if (closed) subject.push(subject[0]);
+      a = b;
+    }
+
+    return subject;
+  };
+
+  function polygonInside(p, a, b) {
+    return (b[0] - a[0]) * (p[1] - a[1]) < (b[1] - a[1]) * (p[0] - a[0]);
+  }
+
+  // Intersect two infinite lines cd and ab.
+  function polygonIntersect(c, d, a, b) {
+    var x1 = c[0], x3 = a[0], x21 = d[0] - x1, x43 = b[0] - x3,
+        y1 = c[1], y3 = a[1], y21 = d[1] - y1, y43 = b[1] - y3,
+        ua = (x43 * (y1 - y3) - y43 * (x1 - x3)) / (y43 * x21 - x43 * y21);
+    return [x1 + ua * x21, y1 + ua * y21];
+  }
+
+  // Returns true if the polygon is closed.
+  function polygonClosed(coordinates) {
+    var a = coordinates[0],
+        b = coordinates[coordinates.length - 1];
+    return !(a[0] - b[0] || a[1] - b[1]);
+  }
+
+  d3Selection.selection.prototype.translate = translateSelection;
+  d3Transition.transition.prototype.translate = translateSelection;
+  d3Selection.selection.prototype.append = append;
+  d3Selection.selection.prototype.parent = parent;
+  d3Selection.selection.prototype.selectAppend = selectAppend;
+  d3Selection.selection.prototype.tspans = tspans;
+  d3Selection.selection.prototype.appendMany = appendMany;
+  d3Selection.selection.prototype.at = at;
+  d3Selection.selection.prototype.st = st;
+  d3Transition.transition.prototype.at = at;
+  d3Transition.transition.prototype.st = st;
+  d3Selection.selection.prototype.prop = d3Selection.selection.prototype.property;
 
   exports.wordwrap = wordwrap;
   exports.parseAttributes = parseAttributes;
@@ -305,6 +389,7 @@
   exports.loadData = loadData;
   exports.nestBy = nestBy;
   exports.round = round;
+  exports.polygonClip = polygonClip;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

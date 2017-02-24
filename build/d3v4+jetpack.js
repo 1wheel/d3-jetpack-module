@@ -1035,7 +1035,7 @@ var   tau$1 = 2 * pi$1;
   function Path() {
     this._x0 = this._y0 = // start of current subpath
     this._x1 = this._y1 = null; // end of current subpath
-    this._ = [];
+    this._ = "";
   }
 
   function path() {
@@ -1045,22 +1045,22 @@ var   tau$1 = 2 * pi$1;
   Path.prototype = path.prototype = {
     constructor: Path,
     moveTo: function(x, y) {
-      this._.push("M", this._x0 = this._x1 = +x, ",", this._y0 = this._y1 = +y);
+      this._ += "M" + (this._x0 = this._x1 = +x) + "," + (this._y0 = this._y1 = +y);
     },
     closePath: function() {
       if (this._x1 !== null) {
         this._x1 = this._x0, this._y1 = this._y0;
-        this._.push("Z");
+        this._ += "Z";
       }
     },
     lineTo: function(x, y) {
-      this._.push("L", this._x1 = +x, ",", this._y1 = +y);
+      this._ += "L" + (this._x1 = +x) + "," + (this._y1 = +y);
     },
     quadraticCurveTo: function(x1, y1, x, y) {
-      this._.push("Q", +x1, ",", +y1, ",", this._x1 = +x, ",", this._y1 = +y);
+      this._ += "Q" + (+x1) + "," + (+y1) + "," + (this._x1 = +x) + "," + (this._y1 = +y);
     },
     bezierCurveTo: function(x1, y1, x2, y2, x, y) {
-      this._.push("C", +x1, ",", +y1, ",", +x2, ",", +y2, ",", this._x1 = +x, ",", this._y1 = +y);
+      this._ += "C" + (+x1) + "," + (+y1) + "," + (+x2) + "," + (+y2) + "," + (this._x1 = +x) + "," + (this._y1 = +y);
     },
     arcTo: function(x1, y1, x2, y2, r) {
       x1 = +x1, y1 = +y1, x2 = +x2, y2 = +y2, r = +r;
@@ -1077,21 +1077,17 @@ var   tau$1 = 2 * pi$1;
 
       // Is this path empty? Move to (x1,y1).
       if (this._x1 === null) {
-        this._.push(
-          "M", this._x1 = x1, ",", this._y1 = y1
-        );
+        this._ += "M" + (this._x1 = x1) + "," + (this._y1 = y1);
       }
 
       // Or, is (x1,y1) coincident with (x0,y0)? Do nothing.
-      else if (!(l01_2 > epsilon));
+      else if (!(l01_2 > epsilon)) {}
 
       // Or, are (x0,y0), (x1,y1) and (x2,y2) collinear?
       // Equivalently, is (x1,y1) coincident with (x2,y2)?
       // Or, is the radius zero? Line to (x1,y1).
       else if (!(Math.abs(y01 * x21 - y21 * x01) > epsilon) || !r) {
-        this._.push(
-          "L", this._x1 = x1, ",", this._y1 = y1
-        );
+        this._ += "L" + (this._x1 = x1) + "," + (this._y1 = y1);
       }
 
       // Otherwise, draw an arc!
@@ -1108,14 +1104,10 @@ var   tau$1 = 2 * pi$1;
 
         // If the start tangent is not coincident with (x0,y0), line to.
         if (Math.abs(t01 - 1) > epsilon) {
-          this._.push(
-            "L", x1 + t01 * x01, ",", y1 + t01 * y01
-          );
+          this._ += "L" + (x1 + t01 * x01) + "," + (y1 + t01 * y01);
         }
 
-        this._.push(
-          "A", r, ",", r, ",0,0,", +(y01 * x20 > x01 * y20), ",", this._x1 = x1 + t21 * x21, ",", this._y1 = y1 + t21 * y21
-        );
+        this._ += "A" + r + "," + r + ",0,0," + (+(y01 * x20 > x01 * y20)) + "," + (this._x1 = x1 + t21 * x21) + "," + (this._y1 = y1 + t21 * y21);
       }
     },
     arc: function(x, y, r, a0, a1, ccw) {
@@ -1132,16 +1124,12 @@ var   tau$1 = 2 * pi$1;
 
       // Is this path empty? Move to (x0,y0).
       if (this._x1 === null) {
-        this._.push(
-          "M", x0, ",", y0
-        );
+        this._ += "M" + x0 + "," + y0;
       }
 
       // Or, is (x0,y0) not coincident with the previous point? Line to (x0,y0).
       else if (Math.abs(this._x1 - x0) > epsilon || Math.abs(this._y1 - y0) > epsilon) {
-        this._.push(
-          "L", x0, ",", y0
-        );
+        this._ += "L" + x0 + "," + y0;
       }
 
       // Is this arc empty? We’re done.
@@ -1149,25 +1137,20 @@ var   tau$1 = 2 * pi$1;
 
       // Is this a complete circle? Draw two arcs to complete the circle.
       if (da > tauEpsilon) {
-        this._.push(
-          "A", r, ",", r, ",0,1,", cw, ",", x - dx, ",", y - dy,
-          "A", r, ",", r, ",0,1,", cw, ",", this._x1 = x0, ",", this._y1 = y0
-        );
+        this._ += "A" + r + "," + r + ",0,1," + cw + "," + (x - dx) + "," + (y - dy) + "A" + r + "," + r + ",0,1," + cw + "," + (this._x1 = x0) + "," + (this._y1 = y0);
       }
 
       // Otherwise, draw an arc!
       else {
         if (da < 0) da = da % tau$1 + tau$1;
-        this._.push(
-          "A", r, ",", r, ",0,", +(da >= pi$1), ",", cw, ",", this._x1 = x + r * Math.cos(a1), ",", this._y1 = y + r * Math.sin(a1)
-        );
+        this._ += "A" + r + "," + r + ",0," + (+(da >= pi$1)) + "," + cw + "," + (this._x1 = x + r * Math.cos(a1)) + "," + (this._y1 = y + r * Math.sin(a1));
       }
     },
     rect: function(x, y, w, h) {
-      this._.push("M", this._x0 = this._x1 = +x, ",", this._y0 = this._y1 = +y, "h", +w, "v", +h, "h", -w, "Z");
+      this._ += "M" + (this._x0 = this._x1 = +x) + "," + (this._y0 = this._y1 = +y) + "h" + (+w) + "v" + (+h) + "h" + (-w) + "Z";
     },
     toString: function() {
-      return this._.join("");
+      return this._;
     }
   };
 
@@ -1641,8 +1624,13 @@ var   tau$1 = 2 * pi$1;
   };
 
   function poke(q) {
-    if (!q._start) try { start(q); } // let the current task complete
-    catch (e) { if (q._tasks[q._ended + q._active - 1]) abort(q, e); } // task errored synchronously
+    if (!q._start) {
+      try { start(q); } // let the current task complete
+      catch (e) {
+        if (q._tasks[q._ended + q._active - 1]) abort(q, e); // task errored synchronously
+        else if (!q._data) throw e; // await callback errored synchronously
+      }
+    }
   }
 
   function start(q) {
@@ -1684,8 +1672,10 @@ var   tau$1 = 2 * pi$1;
     while (--i >= 0) {
       if (t = q._tasks[i]) {
         q._tasks[i] = null;
-        if (t.abort) try { t.abort(); }
-        catch (e) { /* ignore */ }
+        if (t.abort) {
+          try { t.abort(); }
+          catch (e) { /* ignore */ }
+        }
       }
     }
 
@@ -1694,7 +1684,11 @@ var   tau$1 = 2 * pi$1;
   }
 
   function maybeNotify(q) {
-    if (!q._active && q._call) q._call(q._error, q._data);
+    if (!q._active && q._call) {
+      var d = q._data;
+      q._data = undefined; // allow gc
+      q._call(q._error, d);
+    }
   }
 
   function queue(concurrency) {
@@ -2885,7 +2879,7 @@ var   tau$1 = 2 * pi$1;
     lineEnd: function() {
       switch (this._point) {
         case 2: this._context.lineTo(this._x2, this._y2); break;
-        case 3: this.point(this, this._x2, this._y2); break;
+        case 3: this.point(this._x2, this._y2); break;
       }
       if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
       this._line = 1 - this._line;
@@ -3478,14 +3472,17 @@ var   tau$1 = 2 * pi$1;
   var darker = 0.7;
   var brighter = 1 / darker;
 
+  var reI = "\\s*([+-]?\\d+)\\s*";
+  var reN = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*";
+  var reP = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%\\s*";
   var reHex3 = /^#([0-9a-f]{3})$/;
   var reHex6 = /^#([0-9a-f]{6})$/;
-  var reRgbInteger = /^rgb\(\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*\)$/;
-  var reRgbPercent = /^rgb\(\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*\)$/;
-  var reRgbaInteger = /^rgba\(\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*,\s*([-+]?\d+)\s*,\s*([-+]?\d+(?:\.\d+)?)\s*\)$/;
-  var reRgbaPercent = /^rgba\(\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)\s*\)$/;
-  var reHslPercent = /^hsl\(\s*([-+]?\d+(?:\.\d+)?)\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*\)$/;
-  var reHslaPercent = /^hsla\(\s*([-+]?\d+(?:\.\d+)?)\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)%\s*,\s*([-+]?\d+(?:\.\d+)?)\s*\)$/;
+  var reRgbInteger = new RegExp("^rgb\\(" + [reI, reI, reI] + "\\)$");
+  var reRgbPercent = new RegExp("^rgb\\(" + [reP, reP, reP] + "\\)$");
+  var reRgbaInteger = new RegExp("^rgba\\(" + [reI, reI, reI, reN] + "\\)$");
+  var reRgbaPercent = new RegExp("^rgba\\(" + [reP, reP, reP, reN] + "\\)$");
+  var reHslPercent = new RegExp("^hsl\\(" + [reN, reP, reP] + "\\)$");
+  var reHslaPercent = new RegExp("^hsla\\(" + [reN, reP, reP, reN] + "\\)$");
   var named = {
     aliceblue: 0xf0f8ff,
     antiquewhite: 0xfaebd7,
@@ -4035,7 +4032,7 @@ var   tau$1 = 2 * pi$1;
       var r = color((start = colorRgb(start)).r, (end = colorRgb(end)).r),
           g = color(start.g, end.g),
           b = color(start.b, end.b),
-          opacity = color(start.opacity, end.opacity);
+          opacity = nogamma(start.opacity, end.opacity);
       return function(t) {
         start.r = r(t);
         start.g = g(t);
@@ -5005,7 +5002,7 @@ var   tau$1 = 2 * pi$1;
       if (time < Infinity) timeout = setTimeout(wake, delay);
       if (interval) interval = clearInterval(interval);
     } else {
-      if (!interval) interval = setInterval(poke$1, pokeDelay);
+      if (!interval) clockLast = clockNow, interval = setInterval(poke$1, pokeDelay);
       frame = 1, setFrame(wake);
     }
   }
@@ -5067,9 +5064,9 @@ var   t1$1 = new Date;
 
     interval.filter = function(test) {
       return newInterval(function(date) {
-        while (floori(date), !test(date)) date.setTime(date - 1);
+        if (date >= date) while (floori(date), !test(date)) date.setTime(date - 1);
       }, function(date, step) {
-        while (--step >= 0) while (offseti(date, 1), !test(date));
+        if (date >= date) while (--step >= 0) while (offseti(date, 1), !test(date)) {} // eslint-disable-line no-empty
       });
     };
 
@@ -8201,7 +8198,7 @@ var   durationWeek$1 = durationDay$1 * 7;
 
     for (i in schedules) {
       if ((schedule = schedules[i]).name !== name) { empty = false; continue; }
-      active = schedule.state === STARTED;
+      active = schedule.state > STARTING && schedule.state < ENDING;
       schedule.state = ENDED;
       schedule.timer.stop();
       if (active) schedule.on.call("interrupt", node, node.__data__, schedule.index, schedule.group);
@@ -10013,7 +10010,7 @@ var   keyPrefix$1 = "$";
         row,
         nodeValue,
         i0 = 0,
-        i1,
+        i1 = 0,
         n = nodes.length,
         dx, dy,
         value = parent.value,
@@ -10027,13 +10024,16 @@ var   keyPrefix$1 = "$";
 
     while (i0 < n) {
       dx = x1 - x0, dy = y1 - y0;
-      minValue = maxValue = sumValue = nodes[i0].value;
+
+      // Find the next non-empty node.
+      do sumValue = nodes[i1++].value; while (!sumValue && i1 < n);
+      minValue = maxValue = sumValue;
       alpha = Math.max(dy / dx, dx / dy) / (value * ratio);
       beta = sumValue * sumValue * alpha;
       minRatio = Math.max(maxValue / beta, beta / minValue);
 
       // Keep adding nodes while the aspect ratio maintains or improves.
-      for (i1 = i0 + 1; i1 < n; ++i1) {
+      for (; i1 < n; ++i1) {
         sumValue += nodeValue = nodes[i1].value;
         if (nodeValue < minValue) minValue = nodeValue;
         if (nodeValue > maxValue) maxValue = nodeValue;
@@ -10314,7 +10314,7 @@ var   keyPrefix$1 = "$";
         tree = quadtree(nodes, x$1, y$1).visitAfter(prepare);
         for (i = 0; i < n; ++i) {
           node = nodes[i];
-          ri = radii[i], ri2 = ri * ri;
+          ri = radii[node.index], ri2 = ri * ri;
           xi = node.x + node.vx;
           yi = node.y + node.vy;
           tree.visit(apply);
@@ -10324,7 +10324,7 @@ var   keyPrefix$1 = "$";
       function apply(quad, x0, y0, x1, y1) {
         var data = quad.data, rj = quad.r, r = ri + rj;
         if (data) {
-          if (data.index > i) {
+          if (data.index > node.index) {
             var x = xi - data.x - data.vx,
                 y = yi - data.y - data.vy,
                 l = x * x + y * y;
@@ -10353,9 +10353,16 @@ var   keyPrefix$1 = "$";
       }
     }
 
+    function initialize() {
+      if (!nodes) return;
+      var i, n = nodes.length, node;
+      radii = new Array(n);
+      for (i = 0; i < n; ++i) node = nodes[i], radii[node.index] = +radius(node, i, nodes);
+    }
+
     force.initialize = function(_) {
-      var i, n = (nodes = _).length; radii = new Array(n);
-      for (i = 0; i < n; ++i) radii[i] = +radius(nodes[i], i, nodes);
+      nodes = _;
+      initialize();
     };
 
     force.iterations = function(_) {
@@ -10367,14 +10374,20 @@ var   keyPrefix$1 = "$";
     };
 
     force.radius = function(_) {
-      return arguments.length ? (radius = typeof _ === "function" ? _ : constant$6(+_), force) : radius;
+      return arguments.length ? (radius = typeof _ === "function" ? _ : constant$6(+_), initialize(), force) : radius;
     };
 
     return force;
   }
 
-  function index$2(d, i) {
-    return i;
+  function index$2(d) {
+    return d.index;
+  }
+
+  function find(nodeById, nodeId) {
+    var node = nodeById.get(nodeId);
+    if (!node) throw new Error("missing: " + nodeId);
+    return node;
   }
 
   function link(links) {
@@ -10420,15 +10433,12 @@ var   keyPrefix$1 = "$";
           nodeById = map$1(nodes, id),
           link;
 
-      for (i = 0, count = new Array(n); i < n; ++i) {
-        count[i] = 0;
-      }
-
-      for (i = 0; i < m; ++i) {
+      for (i = 0, count = new Array(n); i < m; ++i) {
         link = links[i], link.index = i;
-        if (typeof link.source !== "object") link.source = nodeById.get(link.source);
-        if (typeof link.target !== "object") link.target = nodeById.get(link.target);
-        ++count[link.source.index], ++count[link.target.index];
+        if (typeof link.source !== "object") link.source = find(nodeById, link.source);
+        if (typeof link.target !== "object") link.target = find(nodeById, link.target);
+        count[link.source.index] = (count[link.source.index] || 0) + 1;
+        count[link.target.index] = (count[link.target.index] || 0) + 1;
       }
 
       for (i = 0, bias = new Array(m); i < m; ++i) {
@@ -10639,9 +10649,9 @@ var   keyPrefix$1 = "$";
 
     function initialize() {
       if (!nodes) return;
-      var i, n = nodes.length;
+      var i, n = nodes.length, node;
       strengths = new Array(n);
-      for (i = 0; i < n; ++i) strengths[i] = +strength(nodes[i], i, nodes);
+      for (i = 0; i < n; ++i) node = nodes[i], strengths[node.index] = +strength(node, i, nodes);
     }
 
     function accumulate(quad) {
@@ -11894,10 +11904,11 @@ var   keyPrefix$1 = "$";
           edges = this.edges;
 
       this.cells.forEach(function(cell, i) {
+        if (!(m = (halfedges = cell.halfedges).length)) return;
         var site = cell.site,
-            halfedges = cell.halfedges,
+            halfedges,
             j = -1,
-            m = halfedges.length,
+            m,
             s0,
             e1 = edges[halfedges[m - 1]],
             s1 = e1.left === site ? e1.right : e1.left;
@@ -11906,7 +11917,7 @@ var   keyPrefix$1 = "$";
           s0 = s1;
           e1 = edges[halfedges[j]];
           s1 = e1.left === site ? e1.right : e1.left;
-          if (i < s0.index && i < s1.index && triangleArea(site, s0, s1) < 0) {
+          if (s0 && s1 && i < s0.index && i < s1.index && triangleArea(site, s0, s1) < 0) {
             triangles.push([site.data, s0.data, s1.data]);
           }
         }
@@ -11924,6 +11935,29 @@ var   keyPrefix$1 = "$";
           target: edge.right.data
         };
       });
+    },
+
+    find: function(x, y, radius) {
+      var that = this, i0, i1 = that._found || 0, n = that.cells.length, cell;
+
+      // Use the previously-found cell, or start with an arbitrary one.
+      while (!(cell = that.cells[i1])) if (++i1 >= n) return null;
+      var dx = x - cell.site[0], dy = y - cell.site[1], d2 = dx * dx + dy * dy;
+
+      // Traverse the half-edges to find a closer cell, if any.
+      do {
+        cell = that.cells[i0 = i1], i1 = null;
+        cell.halfedges.forEach(function(e) {
+          var edge = that.edges[e], v = edge.left;
+          if ((v === cell.site || !v) && !(v = edge.right)) return;
+          var vx = x - v[0], vy = y - v[1], v2 = vx * vx + vy * vy;
+          if (v2 < d2) d2 = v2, i1 = v.index;
+        });
+      } while (i1 !== null);
+
+      that._found = i0;
+
+      return radius == null || d2 <= radius * radius ? cell.site : null;
     }
   }
 
@@ -12076,6 +12110,7 @@ var   keyPrefix$1 = "$";
         y0 = x0,
         y1 = x1,
         duration = 250,
+        interpolate = interpolateZoom,
         gestures = [],
         listeners = dispatch("start", "zoom", "end"),
         touchstarting,
@@ -12149,9 +12184,14 @@ var   keyPrefix$1 = "$";
     }
 
     function constrain(transform, extent) {
-      var dx = Math.min(0, transform.invertX(extent[0][0]) - x0) || Math.max(0, transform.invertX(extent[1][0]) - x1),
-          dy = Math.min(0, transform.invertY(extent[0][1]) - y0) || Math.max(0, transform.invertY(extent[1][1]) - y1);
-      return dx || dy ? transform.translate(dx, dy) : transform;
+      var dx0 = transform.invertX(extent[0][0]) - x0,
+          dx1 = transform.invertX(extent[1][0]) - x1,
+          dy0 = transform.invertY(extent[0][1]) - y0,
+          dy1 = transform.invertY(extent[1][1]) - y1;
+      return transform.translate(
+        dx1 > dx0 ? (dx0 + dx1) / 2 : Math.min(0, dx0) || Math.max(0, dx1),
+        dy1 > dy0 ? (dy0 + dy1) / 2 : Math.min(0, dy0) || Math.max(0, dy1)
+      );
     }
 
     function centroid(extent) {
@@ -12171,7 +12211,7 @@ var   keyPrefix$1 = "$";
                 w = Math.max(e[1][0] - e[0][0], e[1][1] - e[0][1]),
                 a = that.__zoom,
                 b = typeof transform === "function" ? transform.apply(that, args) : transform,
-                i = interpolateZoom(a.invert(p).concat(w / a.k), b.invert(p).concat(w / b.k));
+                i = interpolate(a.invert(p).concat(w / a.k), b.invert(p).concat(w / b.k));
             return function(t) {
               if (t === 1) t = b; // Avoid rounding error on end.
               else { var l = i(t), k = w / l[2]; t = new Transform(k, p[0] - l[0] * k, p[1] - l[1] * k); }
@@ -12305,20 +12345,29 @@ var   keyPrefix$1 = "$";
       if (!filter.apply(this, arguments)) return;
       var g = gesture(this, arguments),
           touches = exports.event.changedTouches,
+          started,
           n = touches.length, i, t, p;
 
       nopropagation$1();
       for (i = 0; i < n; ++i) {
         t = touches[i], p = touch(this, touches, t.identifier);
         p = [p, this.__zoom.invert(p), t.identifier];
-        if (!g.touch0) g.touch0 = p;
+        if (!g.touch0) g.touch0 = p, started = true;
         else if (!g.touch1) g.touch1 = p;
       }
+
+      // If this is a dbltap, reroute to the (optional) dblclick.zoom handler.
       if (touchstarting) {
         touchstarting = clearTimeout(touchstarting);
-        if (!g.touch1) return g.end(), dblclicked.apply(this, arguments);
+        if (!g.touch1) {
+          g.end();
+          p = select(this).on("dblclick.zoom");
+          if (p) p.apply(this, arguments);
+          return;
+        }
       }
-      if (exports.event.touches.length === n) {
+
+      if (started) {
         touchstarting = setTimeout(function() { touchstarting = null; }, touchDelay);
         interrupt(this);
         g.start();
@@ -12387,6 +12436,10 @@ var   keyPrefix$1 = "$";
 
     zoom.duration = function(_) {
       return arguments.length ? (duration = +_, zoom) : duration;
+    };
+
+    zoom.interpolate = function(_) {
+      return arguments.length ? (interpolate = _, zoom) : interpolate;
     };
 
     zoom.on = function() {
@@ -12819,8 +12872,7 @@ var   keyPrefix$1 = "$";
           if (type in flipY) overlay.attr("cursor", cursors[type = flipY[type]]);
         }
 
-        selection = state.selection; // May be set by brush.move!
-
+        if (state.selection) selection = state.selection; // May be set by brush.move!
         if (lockX) w1 = selection[0][0], e1 = selection[1][0];
         if (lockY) n1 = selection[0][1], s1 = selection[1][1];
 
@@ -12847,6 +12899,7 @@ var   keyPrefix$1 = "$";
         }
         group.attr("pointer-events", "all");
         overlay.attr("cursor", cursors.overlay);
+        if (state.selection) selection = state.selection; // May be set by brush.move (on start)!
         if (empty$1(selection)) state.selection = null, redraw.call(that);
         emit.end();
       }
@@ -14405,107 +14458,95 @@ var   y0$3;
   }
 
   function PathContext(context) {
-    var pointRadius = 4.5;
-
-    var stream = {
-      point: point,
-
-      // While inside a line, override point to moveTo then lineTo.
-      lineStart: function() { stream.point = pointLineStart; },
-      lineEnd: lineEnd,
-
-      // While inside a polygon, override lineEnd to closePath.
-      polygonStart: function() { stream.lineEnd = lineEndPolygon; },
-      polygonEnd: function() { stream.lineEnd = lineEnd; stream.point = point; },
-
-      pointRadius: function(_) {
-        pointRadius = _;
-        return stream;
-      },
-
-      result: noop$2
-    };
-
-    function point(x, y) {
-      context.moveTo(x + pointRadius, y);
-      context.arc(x, y, pointRadius, 0, tau$3);
-    }
-
-    function pointLineStart(x, y) {
-      context.moveTo(x, y);
-      stream.point = pointLine;
-    }
-
-    function pointLine(x, y) {
-      context.lineTo(x, y);
-    }
-
-    function lineEnd() {
-      stream.point = point;
-    }
-
-    function lineEndPolygon() {
-      context.closePath();
-    }
-
-    return stream;
+    this._context = context;
   }
 
-  function PathString() {
-    var pointCircle = circle$2(4.5),
-        string = [];
-
-    var stream = {
-      point: point,
-      lineStart: lineStart,
-      lineEnd: lineEnd,
-      polygonStart: function() {
-        stream.lineEnd = lineEndPolygon;
-      },
-      polygonEnd: function() {
-        stream.lineEnd = lineEnd;
-        stream.point = point;
-      },
-      pointRadius: function(_) {
-        pointCircle = circle$2(_);
-        return stream;
-      },
-      result: function() {
-        if (string.length) {
-          var result = string.join("");
-          string = [];
-          return result;
+  PathContext.prototype = {
+    _radius: 4.5,
+    pointRadius: function(_) {
+      return this._radius = _, this;
+    },
+    polygonStart: function() {
+      this._line = 0;
+    },
+    polygonEnd: function() {
+      this._line = NaN;
+    },
+    lineStart: function() {
+      this._point = 0;
+    },
+    lineEnd: function() {
+      if (this._line === 0) this._context.closePath();
+      this._point = NaN;
+    },
+    point: function(x, y) {
+      switch (this._point) {
+        case 0: {
+          this._context.moveTo(x, y);
+          this._point = 1;
+          break;
+        }
+        case 1: {
+          this._context.lineTo(x, y);
+          break;
+        }
+        default: {
+          this._context.moveTo(x + this._radius, y);
+          this._context.arc(x, y, this._radius, 0, tau$3);
+          break;
         }
       }
-    };
+    },
+    result: noop$2
+  };
 
-    function point(x, y) {
-      string.push("M", x, ",", y, pointCircle);
-    }
-
-    function pointLineStart(x, y) {
-      string.push("M", x, ",", y);
-      stream.point = pointLine;
-    }
-
-    function pointLine(x, y) {
-      string.push("L", x, ",", y);
-    }
-
-    function lineStart() {
-      stream.point = pointLineStart;
-    }
-
-    function lineEnd() {
-      stream.point = point;
-    }
-
-    function lineEndPolygon() {
-      string.push("Z");
-    }
-
-    return stream;
+  function PathString() {
+    this._string = [];
   }
+
+  PathString.prototype = {
+    _circle: circle$2(4.5),
+    pointRadius: function(_) {
+      return this._circle = circle$2(_), this;
+    },
+    polygonStart: function() {
+      this._line = 0;
+    },
+    polygonEnd: function() {
+      this._line = NaN;
+    },
+    lineStart: function() {
+      this._point = 0;
+    },
+    lineEnd: function() {
+      if (this._line === 0) this._string.push("Z");
+      this._point = NaN;
+    },
+    point: function(x, y) {
+      switch (this._point) {
+        case 0: {
+          this._string.push("M", x, ",", y);
+          this._point = 1;
+          break;
+        }
+        case 1: {
+          this._string.push("L", x, ",", y);
+          break;
+        }
+        default: {
+          this._string.push("M", x, ",", y, this._circle);
+          break;
+        }
+      }
+    },
+    result: function() {
+      if (this._string.length) {
+        var result = this._string.join("");
+        this._string = [];
+        return result;
+      }
+    }
+  };
 
   function circle$2(radius) {
     return "m0," + radius
@@ -14514,11 +14555,9 @@ var   y0$3;
         + "z";
   }
 
-  function index$3() {
+  function index$3(projection, context) {
     var pointRadius = 4.5,
-        projection,
         projectionStream,
-        context,
         contextStream;
 
     function path(object) {
@@ -14545,12 +14584,12 @@ var   y0$3;
     };
 
     path.projection = function(_) {
-      return arguments.length ? (projectionStream = (projection = _) == null ? identity$7 : _.stream, path) : projection;
+      return arguments.length ? (projectionStream = _ == null ? (projection = null, identity$7) : (projection = _).stream, path) : projection;
     };
 
     path.context = function(_) {
       if (!arguments.length) return context;
-      contextStream = (context = _) == null ? new PathString : new PathContext(_);
+      contextStream = _ == null ? (context = null, new PathString) : new PathContext(context = _);
       if (typeof pointRadius !== "function") contextStream.pointRadius(pointRadius);
       return path;
     };
@@ -14561,7 +14600,7 @@ var   y0$3;
       return path;
     };
 
-    return path.projection(null).context(null);
+    return path.projection(projection).context(context);
   }
 
   var sum$2 = adder();
@@ -15025,26 +15064,25 @@ var   y0$3;
     return clip(visible, clipLine, interpolate, smallRadius ? [0, -radius] : [-pi$3, radius - pi$3]);
   }
 
-  function transform$1(prototype) {
+  function transform$1(methods) {
     return {
-      stream: transform$2(prototype)
+      stream: transformer(methods)
     };
   }
 
-  function transform$2(prototype) {
-    function T() {}
-    var p = T.prototype = Object.create(Transform$1.prototype);
-    for (var k in prototype) p[k] = prototype[k];
+  function transformer(methods) {
     return function(stream) {
-      var t = new T;
-      t.stream = stream;
-      return t;
+      var s = new TransformStream;
+      for (var key in methods) s[key] = methods[key];
+      s.stream = stream;
+      return s;
     };
   }
 
-  function Transform$1() {}
+  function TransformStream() {}
 
-  Transform$1.prototype = {
+  TransformStream.prototype = {
+    constructor: TransformStream,
     point: function(x, y) { this.stream.point(x, y); },
     sphere: function() { this.stream.sphere(); },
     lineStart: function() { this.stream.lineStart(); },
@@ -15053,41 +15091,33 @@ var   y0$3;
     polygonEnd: function() { this.stream.polygonEnd(); }
   };
 
-  function fit(project, extent, object) {
+  function fitExtent(projection, extent, object) {
     var w = extent[1][0] - extent[0][0],
         h = extent[1][1] - extent[0][1],
-        clip = project.clipExtent && project.clipExtent();
+        clip = projection.clipExtent && projection.clipExtent();
 
-    project
+    projection
         .scale(150)
         .translate([0, 0]);
 
-    if (clip != null) project.clipExtent(null);
+    if (clip != null) projection.clipExtent(null);
 
-    geoStream(object, project.stream(boundsStream$1));
+    geoStream(object, projection.stream(boundsStream$1));
 
     var b = boundsStream$1.result(),
         k = Math.min(w / (b[1][0] - b[0][0]), h / (b[1][1] - b[0][1])),
         x = +extent[0][0] + (w - k * (b[1][0] + b[0][0])) / 2,
         y = +extent[0][1] + (h - k * (b[1][1] + b[0][1])) / 2;
 
-    if (clip != null) project.clipExtent(clip);
+    if (clip != null) projection.clipExtent(clip);
 
-    return project
+    return projection
         .scale(k * 150)
         .translate([x, y]);
   }
 
-  function fitSize(project) {
-    return function(size, object) {
-      return fit(project, [[0, 0], size], object);
-    };
-  }
-
-  function fitExtent(project) {
-    return function(extent, object) {
-      return fit(project, extent, object);
-    };
+  function fitSize(projection, size, object) {
+    return fitExtent(projection, [[0, 0], size], object);
   }
 
   var maxDepth = 16;
@@ -15099,7 +15129,7 @@ var   y0$3;
   }
 
   function resampleNone(project) {
-    return transform$2({
+    return transformer({
       point: function(x, y) {
         x = project(x, y);
         this.stream.point(x[0], x[1]);
@@ -15190,7 +15220,7 @@ var   y0$3;
     };
   }
 
-  var transformRadians = transform$2({
+  var transformRadians = transformer({
     point: function(x, y) {
       this.stream.point(x * radians, y * radians);
     }
@@ -15258,9 +15288,13 @@ var   y0$3;
       return arguments.length ? (projectResample = resample(projectTransform, delta2 = _ * _), reset()) : sqrt$1(delta2);
     };
 
-    projection.fitExtent = fitExtent(projection);
+    projection.fitExtent = function(extent, object) {
+      return fitExtent(projection, extent, object);
+    };
 
-    projection.fitSize = fitSize(projection);
+    projection.fitSize = function(size, object) {
+      return fitSize(projection, size, object);
+    };
 
     function recenter() {
       projectRotate = compose(rotate = rotateRadians(deltaLambda, deltaPhi, deltaGamma), project);
@@ -15295,11 +15329,27 @@ var   y0$3;
     return p;
   }
 
+  function cylindricalEqualAreaRaw(phi0) {
+    var cosPhi0 = cos(phi0);
+
+    function forward(lambda, phi) {
+      return [lambda * cosPhi0, sin(phi) / cosPhi0];
+    }
+
+    forward.invert = function(x, y) {
+      return [x / cosPhi0, asin$1(y * cosPhi0)];
+    };
+
+    return forward;
+  }
+
   function conicEqualAreaRaw(y0, y1) {
-    var sy0 = sin(y0),
-        n = (sy0 + sin(y1)) / 2,
-        c = 1 + sy0 * (2 * n - sy0),
-        r0 = sqrt$1(c) / n;
+    var sy0 = sin(y0), n = (sy0 + sin(y1)) / 2;
+
+    // Are the parallels symmetrical around the Equator?
+    if (abs(n) < epsilon$4) return cylindricalEqualAreaRaw(y0);
+
+    var c = 1 + sy0 * (2 * n - sy0), r0 = sqrt$1(c) / n;
 
     function project(x, y) {
       var r = sqrt$1(c - 2 * n * sin(y)) / n;
@@ -15308,7 +15358,7 @@ var   y0$3;
 
     project.invert = function(x, y) {
       var r0y = r0 - y;
-      return [atan2(x, r0y) / n, asin$1((c - (x * x + r0y * r0y) * n * n) / (2 * n))];
+      return [atan2(x, abs(r0y)) / n * sign$1(r0y), asin$1((c - (x * x + r0y * r0y) * n * n) / (2 * n))];
     };
 
     return project;
@@ -15381,7 +15431,7 @@ var   y0$3;
     albersUsa.precision = function(_) {
       if (!arguments.length) return lower48.precision();
       lower48.precision(_), alaska.precision(_), hawaii.precision(_);
-      return albersUsa;
+      return reset();
     };
 
     albersUsa.scale = function(_) {
@@ -15409,12 +15459,21 @@ var   y0$3;
           .clipExtent([[x - 0.214 * k + epsilon$4, y + 0.166 * k + epsilon$4], [x - 0.115 * k - epsilon$4, y + 0.234 * k - epsilon$4]])
           .stream(pointStream);
 
-      return albersUsa;
+      return reset();
     };
 
-    albersUsa.fitExtent = fitExtent(albersUsa);
+    albersUsa.fitExtent = function(extent, object) {
+      return fitExtent(albersUsa, extent, object);
+    };
 
-    albersUsa.fitSize = fitSize(albersUsa);
+    albersUsa.fitSize = function(size, object) {
+      return fitSize(albersUsa, size, object);
+    };
+
+    function reset() {
+      cache = cacheStream = null;
+      return albersUsa;
+    }
 
     return albersUsa.scale(1070);
   }
@@ -15534,7 +15593,7 @@ var   y0$3;
 
     project.invert = function(x, y) {
       var fy = f - y, r = sign$1(n) * sqrt$1(x * x + fy * fy);
-      return [atan2(x, fy) / n, 2 * atan(pow$1(f / r, 1 / n)) - halfPi$2];
+      return [atan2(x, abs(fy)) / n * sign$1(fy), 2 * atan(pow$1(f / r, 1 / n)) - halfPi$2];
     };
 
     return project;
@@ -15571,7 +15630,7 @@ var   y0$3;
 
     project.invert = function(x, y) {
       var gy = g - y;
-      return [atan2(x, gy) / n, g - sign$1(n) * sqrt$1(x * x + gy * gy)];
+      return [atan2(x, abs(gy)) / n * sign$1(gy), g - sign$1(n) * sqrt$1(x * x + gy * gy)];
     };
 
     return project;
@@ -15766,6 +15825,17 @@ var   y0$3;
     return s;
   };
 
+  function parent() {
+    var parents = [];
+    return this.filter(function() {
+      if (parents.indexOf(this.parentNode) > -1) return false;
+      parents.push(this.parentNode);
+      return true;
+    }).select(function() {
+      return this.parentNode;
+    });
+  }
+
   function selectAppend(name) {
     var select = selector(name),
        n = parseAttributes(name), s;
@@ -15784,11 +15854,17 @@ var   y0$3;
 
   function tspans(lines, lh) {
     return this.selectAll('tspan')
-        .data(lines).enter()
+        .data(function(d) {
+          return (typeof(lines) == 'function' ? lines(d) : lines)
+            .map(function(l) {
+              return { line: l, parent: d }
+            });
+        })
+        .enter()
       .append('tspan')
-        .text(function(d) { return d; })
+        .text(function(d) { return d.line; })
         .attr('x', 0)
-        .attr('dy', function(d, i) { return i ? lh || 15 : 0; });
+        .attr('dy', function(d, i) { return i ? (typeof(lh) == 'function' ? lh(d.parent, d.line, i) : lh) || 15 : 0; });
   };
 
   function appendMany(data, name){
@@ -15905,6 +15981,9 @@ var   y0$3;
     c = c || {}
 
     c.margin = c.margin || {top: 20, right: 20, bottom: 20, left: 20}
+    ;['top', 'right', 'bottom', 'left'].forEach(function(d){
+      if (!c.margin[d] && c.margin[d] != 0) c.margin[d] = 20 
+    })
 
     c.width  = c.width  || c.totalWidth  - c.margin.left - c.margin.right || 900
     c.height = c.height || c.totalHeight - c.margin.top - c.margin.bottom || 460
@@ -15979,9 +16058,10 @@ var   y0$3;
           y = e.clientY,
           n = tt.node(),
           nBB = n.getBoundingClientRect(),
-          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+          doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop,
+          topPos = y+doctop-nBB.height-18;
 
-      tt.style('top', (y+doctop-nBB.height-18)+'px');
+      tt.style('top', (topPos < 0 ? 18 + y : topPos)+'px');
       tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
     }
 
@@ -16015,14 +16095,77 @@ var   y0$3;
     return p ? Math.round(n * (p = Math.pow(10, p))) / p : Math.round(n);
   };
 
-  selection.prototype.translate = translateSelection
-  selection.prototype.append = append
-  selection.prototype.selectAppend = selectAppend
-  selection.prototype.tspans = tspans
-  selection.prototype.appendMany = appendMany
-  selection.prototype.at = at
-  selection.prototype.st = st
-  selection.prototype.prop = selection.prototype.property
+  // Clips the specified subject polygon to the specified clip polygon;
+  // requires the clip polygon to be counterclockwise and convex.
+  // https://en.wikipedia.org/wiki/Sutherland–Hodgman_algorithm
+  function polygonClip(clip, subject) {
+    var input,
+        closed = polygonClosed(subject),
+        i = -1,
+        n = clip.length - polygonClosed(clip),
+        j,
+        m,
+        a = clip[n - 1],
+      b,
+      c,
+      d;
+
+    while (++i < n) {
+      input = subject.slice();
+      subject.length = 0;
+      b = clip[i];
+      c = input[(m = input.length - closed) - 1];
+      j = -1;
+      while (++j < m) {
+        d = input[j];
+        if (polygonInside(d, a, b)) {
+          if (!polygonInside(c, a, b)) {
+            subject.push(polygonIntersect(c, d, a, b));
+          }
+          subject.push(d);
+        } else if (polygonInside(c, a, b)) {
+          subject.push(polygonIntersect(c, d, a, b));
+        }
+        c = d;
+      }
+      if (closed) subject.push(subject[0]);
+      a = b;
+    }
+
+    return subject;
+  };
+
+  function polygonInside(p, a, b) {
+    return (b[0] - a[0]) * (p[1] - a[1]) < (b[1] - a[1]) * (p[0] - a[0]);
+  }
+
+  // Intersect two infinite lines cd and ab.
+  function polygonIntersect(c, d, a, b) {
+    var x1 = c[0], x3 = a[0], x21 = d[0] - x1, x43 = b[0] - x3,
+        y1 = c[1], y3 = a[1], y21 = d[1] - y1, y43 = b[1] - y3,
+        ua = (x43 * (y1 - y3) - y43 * (x1 - x3)) / (y43 * x21 - x43 * y21);
+    return [x1 + ua * x21, y1 + ua * y21];
+  }
+
+  // Returns true if the polygon is closed.
+  function polygonClosed(coordinates) {
+    var a = coordinates[0],
+        b = coordinates[coordinates.length - 1];
+    return !(a[0] - b[0] || a[1] - b[1]);
+  }
+
+  selection.prototype.translate = translateSelection;
+  transition.prototype.translate = translateSelection;
+  selection.prototype.append = append;
+  selection.prototype.parent = parent;
+  selection.prototype.selectAppend = selectAppend;
+  selection.prototype.tspans = tspans;
+  selection.prototype.appendMany = appendMany;
+  selection.prototype.at = at;
+  selection.prototype.st = st;
+  transition.prototype.at = at;
+  transition.prototype.st = st;
+  selection.prototype.prop = selection.prototype.property;
 
   exports.bisect = bisectRight;
   exports.bisectRight = bisectRight;
@@ -16394,6 +16537,7 @@ var   y0$3;
   exports.loadData = loadData;
   exports.nestBy = nestBy;
   exports.round = round;
+  exports.polygonClip = polygonClip;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

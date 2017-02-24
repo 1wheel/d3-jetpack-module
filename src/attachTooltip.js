@@ -40,9 +40,10 @@ export default function(sel, tooltipSel, fieldFns){
         y = e.clientY,
         n = tt.node(),
         nBB = n.getBoundingClientRect(),
-        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop;
+        doctop = (window.scrollY)? window.scrollY : (document.documentElement && document.documentElement.scrollTop)? document.documentElement.scrollTop : document.body.scrollTop,
+        topPos = y+doctop-nBB.height-18;
 
-    tt.style('top', (y+doctop-nBB.height-18)+'px');
+    tt.style('top', (topPos < 0 ? 18 + y : topPos)+'px');
     tt.style('left', Math.min(Math.max(20, (x-nBB.width/2)), window.innerWidth - nBB.width - 20)+'px');
   }
 
