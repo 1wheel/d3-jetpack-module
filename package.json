@@ -1,6 +1,6 @@
 {
   "name": "d3-jetpack-module",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "handy shortcuts for d3",
   "keywords": [
     "d3",
@@ -9,6 +9,7 @@
   "license": "BSD-3-Clause",
   "main": "build/d3-jetpack-module.js",
   "jsnext:main": "index",
+  "module": "index",
   "homepage": "https://github.com/1wheel/d3-jetpack-module",
   "repository": {
     "type": "git",
